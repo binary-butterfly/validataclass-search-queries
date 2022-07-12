@@ -1,0 +1,23 @@
+[paths]
+source =
+    src
+    */site-packages
+
+[run]
+branch = True
+source = validataclass_search_queries
+omit =
+    */_version.py
+
+[report]
+show_missing = True
+skip_empty = True
+skip_covered = True
+
+[html]
+directory = reports/coverage_html/
+skip_covered = False
+show_contexts = True
+
+[xml]
+output = reports/coverage.xml
