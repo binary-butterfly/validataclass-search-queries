@@ -4,8 +4,8 @@ Copyright (c) 2022, binary butterfly GmbH
 All rights reserved.
 """
 
-from validataclass_search_queries import hello_world
+from validataclass_search_queries.sorting import SortingDirection, SortingDirectionValidator
 
 
 def test_hello_world():
-    assert hello_world() == 'hello world'
+    assert SortingDirectionValidator().validate('ASC') == SortingDirection.ASC
