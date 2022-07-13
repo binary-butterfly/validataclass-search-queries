@@ -4,34 +4,18 @@ Copyright (c) 2022, binary butterfly GmbH
 All rights reserved.
 """
 
-from abc import ABC, abstractmethod
 from typing import Any
 
 from sqlalchemy.sql import ColumnElement
 from validataclass.dataclasses import validataclass, Default
 from validataclass.validators import AnyOfValidator
 
+from .abstract_sorting_mixin import AbstractSortingMixin
 from .sorting_direction import SortingDirection, SortingDirectionValidator
 
 __all__ = [
-    'AbstractSortingMixin',
     'SortingMixin',
 ]
-
-
-class AbstractSortingMixin(ABC):
-    """
-    Abstract base class for the sorting mixin used in search query dataclasses.
-    """
-
-    @abstractmethod
-    def get_order_column(self, model_cls: Any) -> ColumnElement:
-        """
-        Returns the column that the query should be ordered by (including the sorting direction).
-
-        The "model_cls" parameter should be the class of the database model that is queried.
-        """
-        raise NotImplementedError
 
 
 @validataclass
