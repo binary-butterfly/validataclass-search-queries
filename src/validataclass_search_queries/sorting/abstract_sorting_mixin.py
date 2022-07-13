@@ -19,7 +19,7 @@ class AbstractSortingMixin(ABC):
     Abstract base class for the sorting mixin used in search query dataclasses.
     """
 
-    @abstractmethod
+    @abstractmethod  # pragma: nocover
     def get_order_column(self, model_cls: Any) -> ColumnElement:
         """
         Returns the column that the query should be ordered by (including the sorting direction).

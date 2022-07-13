@@ -19,7 +19,7 @@ class AbstractPaginationMixin(ABC):
     Abstract base class for pagination mixins used in search query dataclasses.
     """
 
-    @abstractmethod
+    @abstractmethod  # pragma: nocover
     def apply_pagination_to_query(self, query: Query, model_cls: Any) -> Query:
         """
         Applies the pagination parameters to an SQLAlchemy query and returns the new query.

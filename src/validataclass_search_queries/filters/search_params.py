@@ -62,7 +62,7 @@ class SearchParam(ABC):
     def __init__(self, column_name: Optional[str] = None):
         self.column_name = column_name
 
-    @staticmethod
+    @staticmethod  # pragma: nocover
     @abstractmethod
     def sqlalchemy_filter(column: ColumnElement, value: Any) -> ColumnElement:
         """
