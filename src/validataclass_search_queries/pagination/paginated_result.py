@@ -4,14 +4,16 @@ Copyright (c) 2022, binary butterfly GmbH
 All rights reserved.
 """
 
-from typing import List, TypeVar
+from typing import List, TypeVar, Callable, Iterable
 
 __all__ = [
     'PaginatedResult',
     'T_Result',
+    'T_MappedResult',
 ]
 
 T_Result = TypeVar('T_Result')
+T_MappedResult = TypeVar('T_MappedResult')
 
 
 class PaginatedResult(List[T_Result]):
@@ -25,6 +27,63 @@ class PaginatedResult(List[T_Result]):
     # Total amount of results in the original query (before pagination)
     total_count: int
 
-    def __init__(self, *args, total_count: int):
-        super().__init__(*args)
+    def __init__(self, items: Iterable[T_Result], *, total_count: int):
+        """
+        Creates a PaginatedResult from any iterable.
+
+        The keyword argument `total_count` should be set to the total amount of items *before* pagination.
+        """
+        list.__init__(self, items)
         self.total_count = total_count
+
+    def map(self, map_func: Callable[[T_Result], T_MappedResult]) -> 'PaginatedResult[T_MappedResult]':
+        """
+        Maps every item of the paginated result using the specified mapper function, and returns a *new* PaginatedResult
+        containing the mapped items (with the same `total_count` as the original one).
+
+        The mapper function can be any callable that accepts the type of objects stored in the PaginatedResult.
+
+        Examples:
+
+        ```
+        # Here, the paginated result contains objects of type Customer.
+        paginated_result: PaginatedResult[Customer]
+
+        # This method maps Customer objects to simple dictionaries
+        def map_customers(customer: Customer) -> dict:
+            return {
+                'id': customer.id,
+                'name': customer.name,
+            }
+
+        # This results in a PaginatedResult[dict] containing dictionaries as defined in map_customers above:
+        mapped_customers = paginated_result.map(map_customers)
+
+        # Assuming that the Customer class has a similar method `to_dict()` that takes no arguments, we can also do this:
+        mapped_customers = paginated_result.map(Customers.to_dict)
+        ```
+        """
+        # We use self.__class__() instead of PaginatedResult() to properly support subclassing
+        return self.__class__(
+            map(map_func, self),
+            total_count=self.total_count,
+        )
+
+    def to_dict(self, *, recursive: bool = False) -> dict:
+        """
+        Returns a dictionary representing the PaginatedResult, consisting of the keys "items" (a list of the items) and
+        "total_count" (the total count as an integer).
+
+        If `recursive` is True (default: False), the method will try to convert all items to dictionaries by calling
+        `to_dict()` on the item. If an object does not have a `to_dict` method, the list will contain the unmodified
+        object as if `recursive` was not set.
+        """
+        if recursive:
+            items = [item.to_dict() if hasattr(item, 'to_dict') else item for item in self]
+        else:
+            items = list(self)
+
+        return {
+            'items': items,
+            'total_count': self.total_count,
+        }

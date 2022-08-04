@@ -4,13 +4,15 @@ Copyright (c) 2022, binary butterfly GmbH
 All rights reserved.
 """
 
-from typing import Any
+from typing import Any, Optional
 
 from sqlalchemy.orm import Query
 from sqlalchemy.sql import ColumnElement
 from validataclass.dataclasses import validataclass, Default
 from validataclass.validators import IntegerValidator
 
+from .abstract_pagination_mixin import AbstractPaginationMixin
+from .paginated_result import PaginatedResult
 from .. import pagination, sorting
 
 __all__ = [
@@ -19,7 +21,7 @@ __all__ = [
 
 
 @validataclass
-class CursorPaginationMixin(pagination.AbstractPaginationMixin):
+class CursorPaginationMixin(AbstractPaginationMixin):
     """
     Mixin for cursor pagination in search query dataclasses.
 
@@ -31,9 +33,9 @@ class CursorPaginationMixin(pagination.AbstractPaginationMixin):
     Cursor pagination only works when your query is ordered by ID. This is done automatically, but it means that you
     cannot combine cursor pagination with user-defined ordering.
 
-    By default, the model class must have a column named "id" which is used as the cursor column. To change this,
-    override the `get_pagination_cursor_column` method in your class to return a different cursor column (see default
-    implementation below for how to do that).
+    By default, the model class must have a column named "id" which is used as the cursor column. To change this, you
+    can override the `get_cursor_column_name()` method in your class to return a different column name. There is also
+    `get_cursor_column()` which can be overridden in more complex scenarios.
 
     The mixin adds the parameters "start" and "limit" to the search query dataclass and implements cursor pagination
     for SQLAlchemy queries based on those parameters (using "start" as the cursor value).
@@ -79,14 +81,26 @@ class CursorPaginationMixin(pagination.AbstractPaginationMixin):
         super().__init_subclass__(**kwargs)
 
     @staticmethod
-    def get_pagination_cursor_column(model_cls: Any) -> ColumnElement:
+    def get_cursor_column_name() -> str:
+        """
+        Returns the name of the column that is used as cursor for cursor pagination. Defaults to "id".
+
+        You can override this method in your class to use a different column. For more complex customization, see also
+        `get_cursor_column()` which returns the column (instead of just the name of the column).
+        """
+        return 'id'
+
+    def get_cursor_column(self, model_cls: Any) -> ColumnElement:
         """
         Returns the column that is used as cursor for cursor pagination.
 
-        By default, this returns the "id" column of a model. This method can be overridden in your class to use a
-        different column.
+        By default, this returns the column of a model with the name defined by `get_cursor_column_name()`.
+
+        In most cases, overriding `get_cursor_column_name()` should be enough to use a different column. If you override
+        THIS method, be sure to also adjust `get_cursor_column_name()` so that it still works with other methods like
+        `get_next_start_value()`.
         """
-        return getattr(model_cls, 'id')
+        return getattr(model_cls, self.get_cursor_column_name())
 
     def apply_pagination_to_query(self, query: Query, model_cls: Any) -> Query:
         """
@@ -100,9 +114,38 @@ class CursorPaginationMixin(pagination.AbstractPaginationMixin):
             self.start = 0
 
         # Get the cursor column from the model class
-        key_column = self.get_pagination_cursor_column(model_cls)
+        key_column = self.get_cursor_column(model_cls)
 
         # Cursor pagination requires the data to be ordered by the cursor column
         return query.order_by(key_column) \
             .filter(key_column >= self.start) \
             .limit(self.limit)
+
+    def get_start_parameter_name(self) -> str:
+        """
+        Returns the name of the pagination start parameter ("start" for cursor pagination).
+        """
+        return 'start'
+
+    def get_next_start_value(self, paginated_result: PaginatedResult) -> Optional[int]:
+        """
+        Returns the next value for the pagination start parameter to retrieve the next page of data, or None if there
+        is no next page.
+
+        In case of cursor pagination, this is the next start ID (i.e. the last ID of the current page + 1).
+        """
+        # If the page is not "filled" (less results than page limit), there probably is no next page.
+        if len(paginated_result) < self.limit:
+            return None
+
+        # Get last result in list
+        last_item = paginated_result[-1]
+
+        # Get cursor value (e.g. ID) of last result, allowing both objects and dictionaries, and increment by one
+        cursor_key = self.get_cursor_column_name()
+        if isinstance(last_item, dict):
+            return last_item.get(cursor_key) + 1
+        elif hasattr(last_item, cursor_key):
+            return getattr(last_item, cursor_key) + 1
+        else:
+            raise Exception(f'Last item of PaginatedResult has neither attribute nor dictionary key "{cursor_key}": {last_item}')

@@ -5,7 +5,9 @@ All rights reserved.
 """
 
 import dataclasses
-from typing import Tuple, Iterator
+from typing import Any, Dict, Iterator, Tuple
+
+from validataclass.helpers import UnsetValue
 
 from ..filters import BoundSearchFilter
 
@@ -59,3 +61,21 @@ class BaseSearchQuery:
             if search_param and value is not None:
                 # Generate tuples of parameter name and BoundSearchFilters
                 yield field.name, BoundSearchFilter(field.name, search_param, value)
+
+    def to_dict(self) -> Dict[str, Any]:
+        """
+        Returns the data of all fields that are set in the dataclass as a dictionary, i.e. all fields with values other
+        than None or UnsetValue.
+
+        Does NOT recurse into the data, since search queries should be more or less flat. (This might change in the
+        future to allow for multi-select parameters.)
+        """
+        dataclass_fields = dataclasses.fields(self)  # noqa (will raise TypeError if not a dataclass)
+        data = {}
+
+        for field in dataclass_fields:
+            value = getattr(self, field.name)
+            if value is not None and value is not UnsetValue:
+                data[field.name] = value
+
+        return data

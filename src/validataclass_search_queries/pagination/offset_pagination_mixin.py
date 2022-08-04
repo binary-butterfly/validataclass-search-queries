@@ -4,12 +4,14 @@ Copyright (c) 2022, binary butterfly GmbH
 All rights reserved.
 """
 
-from typing import Any
+from typing import Any, Optional
 
 from sqlalchemy.orm import Query
 from validataclass.dataclasses import validataclass, Default
 from validataclass.validators import IntegerValidator
 
+from .abstract_pagination_mixin import AbstractPaginationMixin
+from .paginated_result import PaginatedResult
 from .. import pagination
 
 __all__ = [
@@ -18,7 +20,7 @@ __all__ = [
 
 
 @validataclass
-class OffsetPaginationMixin(pagination.AbstractPaginationMixin):
+class OffsetPaginationMixin(AbstractPaginationMixin):
     """
     Mixin for offset pagination in search query dataclasses.
 
@@ -78,3 +80,20 @@ class OffsetPaginationMixin(pagination.AbstractPaginationMixin):
         In the case of offset pagination, a `LIMIT ... OFFSET ...` clause is applied to the query.
         """
         return query.offset(self.offset).limit(self.limit)
+
+    def get_start_parameter_name(self) -> str:
+        """
+        Returns the name of the pagination start parameter ("offset" for offset pagination).
+        """
+        return 'offset'
+
+    def get_next_start_value(self, paginated_result: PaginatedResult) -> Optional[int]:
+        """
+        Returns the next value for the pagination start parameter to retrieve the next page of data, or None if there
+        is no next page.
+
+        In case of offset pagination, this is the next offset value (i.e. the current offset value + page limit).
+        """
+        # As long as the next offset is smaller than the total result count, there should be a next page
+        next_offset = self.offset + self.limit
+        return next_offset if next_offset < paginated_result.total_count else None

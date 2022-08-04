@@ -5,9 +5,11 @@ All rights reserved.
 """
 
 from abc import ABC, abstractmethod
-from typing import Any
+from typing import Any, Optional
 
 from sqlalchemy.orm import Query
+
+from .paginated_result import PaginatedResult
 
 __all__ = [
     'AbstractPaginationMixin',
@@ -19,6 +21,14 @@ class AbstractPaginationMixin(ABC):
     Abstract base class for pagination mixins used in search query dataclasses.
     """
 
+    @property
+    @abstractmethod
+    def limit(self) -> int:
+        """
+        The pagination limit (i.e. maximum number of items per page).
+        """
+        raise NotImplementedError
+
     @abstractmethod  # pragma: nocover
     def apply_pagination_to_query(self, query: Query, model_cls: Any) -> Query:
         """
@@ -28,5 +38,21 @@ class AbstractPaginationMixin(ABC):
 
         The "model_cls" parameter should be the class of the database model that is queried. It is needed for example
         for cursor pagination to get the "id" column that the filter should be applied on.
+        """
+        raise NotImplementedError
+
+    @abstractmethod  # pragma: nocover
+    def get_start_parameter_name(self) -> str:
+        """
+        Returns the name of the pagination start parameter (e.g. "start" for cursor pagination or "offset" for offset
+        pagination).
+        """
+        raise NotImplementedError
+
+    @abstractmethod  # pragma: nocover
+    def get_next_start_value(self, paginated_result: PaginatedResult) -> Optional[int]:
+        """
+        Returns the next value for the pagination start parameter (see also: `get_start_parameter_name()`) to retrieve
+        the next page of data, or None if there is no next page.
         """
         raise NotImplementedError
