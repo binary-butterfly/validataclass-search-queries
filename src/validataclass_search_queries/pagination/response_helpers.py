@@ -17,8 +17,9 @@ __all__ = [
 
 def paginated_api_response(
     paginated_result: PaginatedResult[Any],
-    search_query: BaseSearchQuery,
+    search_query: Optional[BaseSearchQuery],
     *,
+    recursive_to_dict: bool = True,
     request_path: Optional[str] = None,
     original_params: Optional[dict] = None,
 ) -> dict:
@@ -47,7 +48,7 @@ def paginated_api_response(
     The keys "items" and "total_count" will always be set.
 
     "items" contains a list with the results (which will be automatically converted to dictionaries if they implement
-    `to_dict()`).
+    `to_dict()`, unless `recursive_to_dict` is set to False).
 
     "total_count" is the total number of results before pagination (i.e. if there are 123 results and the page limit is
     10, there will be 10 items, but "total_count" will be 123).
@@ -67,14 +68,14 @@ def paginated_api_response(
     If `request_path` is not set, the parameter `original_params` will be ignored.
     """
     # Construct base for response dictionary (with keys "items" and "total_count")
-    response_data = paginated_result.to_dict(recursive=True)
+    response_data = paginated_result.to_dict(recursive=recursive_to_dict)
 
     # If the result is empty, there certainly will be no next page
     if len(paginated_result) == 0:
         return response_data
 
     # If pagination is enabled: Add information on how to get the next page
-    if isinstance(search_query, AbstractPaginationMixin):
+    if search_query is not None and isinstance(search_query, AbstractPaginationMixin):
         # Get the start parameter for the next page
         next_start_value = search_query.get_next_start_value(paginated_result)
 
