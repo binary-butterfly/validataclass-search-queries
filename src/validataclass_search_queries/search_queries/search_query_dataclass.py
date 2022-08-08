@@ -7,6 +7,7 @@ All rights reserved.
 import dataclasses
 from typing import Any, Dict
 
+from typing_extensions import dataclass_transform
 from validataclass.dataclasses import validataclass, validataclass_field, Default
 from validataclass.validators import Validator
 
@@ -19,6 +20,10 @@ __all__ = [
 
 # TODO: This special decorator can be replaced with the regular @validataclass decorator when custom field options
 #   are implemented upstream.
+@dataclass_transform(
+    kw_only_default=True,
+    field_specifiers=(dataclasses.field, dataclasses.Field, validataclass_field),
+)
 def search_query_dataclass(cls=None, **kwargs):
     """
     Custom dataclass decorator based on @validataclass, adding support for search parameter fields.
