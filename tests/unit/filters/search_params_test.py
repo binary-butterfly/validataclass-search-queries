@@ -13,8 +13,12 @@ from sqlalchemy.sql import ColumnElement
 from validataclass_search_queries.filters import (
     SearchParamEquals,
     SearchParamContains,
+    SearchParamStartsWith,
+    SearchParamEndsWith,
+    SearchParamBoolean,
     SearchParamIsNone,
     SearchParamIsNotNone,
+    SearchParamTernary,
     SearchParamGreaterThan,
     SearchParamGreaterOrEqual,
     SearchParamLessThan,
@@ -22,6 +26,17 @@ from validataclass_search_queries.filters import (
     SearchParamSince,
     SearchParamUntil,
 )
+
+# Test data for SearchParamContains, SearchParamStartsWidth, SearchParamEndsWidth (substring matching search filters)
+# (Parameters: input_value, expected_param)
+test_data_substring_matches = [
+    # Simple string
+    ('banana', 'banana'),
+
+    # Ensure special characters (SQL 'LIKE' syntax) are escaped properly
+    ('foo%bar_baz', 'foo/%bar/_baz'),
+    ('foo/bar\\baz', 'foo//bar\\baz'),
+]
 
 
 def assert_column_element(element: Any, expected_string: str, *expected_params) -> None:
@@ -43,21 +58,47 @@ def test_search_param_equals(sqlalchemy_column):
     assert_column_element(search_filter, 'unit_test_column = :unit_test_column_1', 42)
 
 
-@pytest.mark.parametrize(
-    'input_value, expected_param',
-    [
-        ('', ''),
-        ('banana', 'banana'),
-
-        # Ensure special characters (SQL 'LIKE' syntax) are escaped properly
-        ('foo%bar_baz', 'foo/%bar/_baz'),
-        ('foo/bar\\baz', 'foo//bar\\baz'),
-    ]
-)
+@pytest.mark.parametrize('input_value, expected_param', test_data_substring_matches)
 def test_search_param_contains(sqlalchemy_column, input_value, expected_param):
     """ Test the SearchParamContains search parameter. """
     search_filter = SearchParamContains().sqlalchemy_filter(sqlalchemy_column, input_value)
     assert_column_element(search_filter, "unit_test_column LIKE '%' || :unit_test_column_1 || '%' ESCAPE '/'", expected_param)
+
+
+@pytest.mark.parametrize('input_value, expected_param', test_data_substring_matches)
+def test_search_param_starts_with(sqlalchemy_column, input_value, expected_param):
+    """ Test the SearchParamStartsWith search parameter. """
+    search_filter = SearchParamStartsWith().sqlalchemy_filter(sqlalchemy_column, input_value)
+    assert_column_element(search_filter, "unit_test_column LIKE :unit_test_column_1 || '%' ESCAPE '/'", expected_param)
+
+
+@pytest.mark.parametrize('input_value, expected_param', test_data_substring_matches)
+def test_search_param_ends_with(sqlalchemy_column, input_value, expected_param):
+    """ Test the SearchParamEndsWith search parameter. """
+    search_filter = SearchParamEndsWith().sqlalchemy_filter(sqlalchemy_column, input_value)
+    assert_column_element(search_filter, "unit_test_column LIKE '%' || :unit_test_column_1 ESCAPE '/'", expected_param)
+
+
+@pytest.mark.parametrize('search_param_cls', [SearchParamContains, SearchParamStartsWith, SearchParamEndsWith])
+def test_search_param_substring_matching_shortcircuit(sqlalchemy_column, search_param_cls):
+    """ Test that SearchParamContains, SearchParamStartsWith and SearchParamEndsWith short-circuit if the value is empty. """
+    assert search_param_cls().sqlalchemy_filter(sqlalchemy_column, '') is sqlalchemy_column
+
+
+@pytest.mark.parametrize(
+    'input_value, expected_str',
+    [
+        (None, 'false'),
+        (True, 'true'),
+        (False, 'false'),
+        (1, 'true'),
+        (0, 'false'),
+    ]
+)
+def test_search_param_boolean(sqlalchemy_column, input_value, expected_str):
+    """ Test the SearchParamBoolean search parameter. """
+    search_filter = SearchParamBoolean().sqlalchemy_filter(sqlalchemy_column, input_value)
+    assert_column_element(search_filter, f'unit_test_column IS {expected_str}')
 
 
 def test_search_param_is_none(sqlalchemy_column):
@@ -72,6 +113,13 @@ def test_search_param_is_not_none(sqlalchemy_column):
     param = SearchParamIsNotNone()
     assert_column_element(param.sqlalchemy_filter(sqlalchemy_column, True), 'unit_test_column IS NOT NULL')
     assert_column_element(param.sqlalchemy_filter(sqlalchemy_column, False), 'unit_test_column IS NULL')
+
+
+def test_search_param_ternary(sqlalchemy_column):
+    """ Test the SearchParamTernary search parameter. """
+    param = SearchParamTernary('yes', 'no')
+    assert_column_element(param.sqlalchemy_filter(sqlalchemy_column, True), 'unit_test_column = :unit_test_column_1', 'yes')
+    assert_column_element(param.sqlalchemy_filter(sqlalchemy_column, False), 'unit_test_column = :unit_test_column_1', 'no')
 
 
 @pytest.mark.parametrize(

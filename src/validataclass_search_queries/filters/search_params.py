@@ -13,8 +13,12 @@ __all__ = [
     'SearchParam',
     'SearchParamEquals',
     'SearchParamContains',
+    'SearchParamStartsWith',
+    'SearchParamEndsWith',
+    'SearchParamBoolean',
     'SearchParamIsNone',
     'SearchParamIsNotNone',
+    'SearchParamTernary',
     'SearchParamGreaterThan',
     'SearchParamGreaterOrEqual',
     'SearchParamLessThan',
@@ -87,13 +91,52 @@ class SearchParamContains(SearchParam):
     """
     Search parameter to filter for partial string matches, i.e. the specified string is contained in the column value.
 
-    This is implemented using a `column LIKE %{value}%` expression. The value is escaped, so that '%' and '_' are
+    This is implemented using a `column LIKE "%{value}%"` expression. The value is escaped, so that '%' and '_' are
     interpreted as literal characters, not as wildcard characters.
     """
 
     @staticmethod
     def sqlalchemy_filter(column: ColumnElement, value: Any) -> ColumnElement:
-        return column.contains(value, autoescape=True)
+        # Short-circuit if value is empty
+        return column.contains(value, autoescape=True) if value else column
+
+
+class SearchParamStartsWith(SearchParam):
+    """
+    Search parameter to filter for prefix string matches, i.e. the column value starts with the specified string.
+
+    This is implemented using a `column LIKE "{value}%"` expression. The value is escaped, so that '%' and '_' are
+    interpreted as literal characters, not as wildcard characters.
+    """
+
+    @staticmethod
+    def sqlalchemy_filter(column: ColumnElement, value: Any) -> ColumnElement:
+        # Short-circuit if value is empty
+        return column.startswith(value, autoescape=True) if value else column
+
+
+class SearchParamEndsWith(SearchParam):
+    """
+    Search parameter to filter for suffix string matches, i.e. the column value ends with the specified string.
+
+    This is implemented using a `column LIKE "%{value}"` expression. The value is escaped, so that '%' and '_' are
+    interpreted as literal characters, not as wildcard characters.
+    """
+
+    @staticmethod
+    def sqlalchemy_filter(column: ColumnElement, value: Any) -> ColumnElement:
+        # Short-circuit if value is empty
+        return column.endswith(value, autoescape=True) if value else column
+
+
+class SearchParamBoolean(SearchParam):
+    """
+    Boolean search parameter to filter a boolean column for true or false.
+    """
+
+    @staticmethod
+    def sqlalchemy_filter(column: ColumnElement, value: Any) -> ColumnElement:
+        return column.is_(bool(value))
 
 
 class SearchParamIsNone(SearchParam):
@@ -120,6 +163,30 @@ class SearchParamIsNotNone(SearchParam):
     @staticmethod
     def sqlalchemy_filter(column: ColumnElement, value: Any) -> ColumnElement:
         return column.is_not(None) if value is True else column.is_(None)
+
+
+class SearchParamTernary(SearchParam):
+    """
+    Boolean search parameter that behaves like a ternary operator. Requires two values, one for True, one for False.
+
+    Example: `SearchParamTernary('yes', 'no')`
+
+    If the search parameter is True, only include results where the specified column equals `value_true` (e.g. "yes").
+    If the search parameter is False, only include results where the specified column equals `value_false` (e.g. "no").
+
+    To specify an alternative column name for this search parameter, use the keyword argument `column_name`.
+    """
+
+    value_true: Any
+    value_false: Any
+
+    def __init__(self, true: Any, false: Any, *, column_name: Optional[str] = None):
+        super().__init__(column_name)
+        self.value_true = true
+        self.value_false = false
+
+    def sqlalchemy_filter(self, column: ColumnElement, value: Any) -> ColumnElement:
+        return column == (self.value_true if value else self.value_false)
 
 
 class SearchParamGreaterThan(SearchParam):
