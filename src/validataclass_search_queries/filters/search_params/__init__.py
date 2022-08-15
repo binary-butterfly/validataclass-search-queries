@@ -20,6 +20,7 @@ from .search_param_greater_less import (
     SearchParamSince,
     SearchParamUntil,
 )
+from .search_param_multi_select import SearchParamMultiSelect
 from .search_param_substring import (
     SearchParamContains,
     SearchParamStartsWith,

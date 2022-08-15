@@ -11,6 +11,7 @@ from .search_params import (
     SearchParamContains,
     SearchParamStartsWith,
     SearchParamEndsWith,
+    SearchParamMultiSelect,
     SearchParamBoolean,
     SearchParamIsNone,
     SearchParamIsNotNone,
