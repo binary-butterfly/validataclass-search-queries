@@ -4,13 +4,16 @@ Copyright (c) 2022, binary butterfly GmbH
 All rights reserved.
 """
 
-from typing import Any, Optional
+from enum import Enum
+from typing import Any, Optional, List, Type
 
-from validataclass.validators import ListValidator, Validator, IntegerValidator
+from validataclass.validators import ListValidator, Validator, IntegerValidator, AnyOfValidator, EnumValidator
 
 __all__ = [
     'MultiSelectValidator',
     'MultiSelectIntegerValidator',
+    'MultiSelectAnyOfValidator',
+    'MultiSelectEnumValidator',
 ]
 
 
@@ -93,8 +96,6 @@ class MultiSelectIntegerValidator(MultiSelectValidator):
     ):
         """
         Create a MultiSelectValidator using a IntegerValidator to validate the items.
-
-        See MultiSelectValidator and IntegerValidator for parameters.
         """
         # Initialize base MultiSelectValidator and IntegerValidator
         super().__init__(
@@ -103,6 +104,59 @@ class MultiSelectIntegerValidator(MultiSelectValidator):
                 max_value=max_value,
                 allow_strings=True,
             ),
+            delimiter=delimiter,
+            max_length=max_length,
+        )
+
+
+class MultiSelectAnyOfValidator(MultiSelectValidator):
+    """
+    Validator for multi-select search parameters that only allows a specified set of values.
+
+    Shortcut for a `MultiSelectValidator` with an `AnyOfValidator`.
+    """
+
+    def __init__(
+        self,
+        # AnyOfValidator settings
+        allowed_values: List[Any],
+        *,
+        # List settings
+        delimiter: str = ',',
+        max_length: Optional[int] = None,
+    ):
+        """
+        Create a MultiSelectValidator using a AnyOfValidator to validate the items.
+        """
+        super().__init__(
+            AnyOfValidator(allowed_values),
+            delimiter=delimiter,
+            max_length=max_length,
+        )
+
+
+class MultiSelectEnumValidator(MultiSelectValidator):
+    """
+    Validator for multi-select search parameters that allows values from an Enum class.
+
+    Shortcut for a `MultiSelectValidator` with an `EnumValidator`.
+    """
+
+    def __init__(
+        self,
+        # EnumValidator settings
+        enum_cls: Type[Enum],
+        *,
+        allowed_values: List[Any] = None,
+        # List settings
+        delimiter: str = ',',
+        max_length: Optional[int] = None,
+    ):
+        """
+        Create a MultiSelectValidator using a EnumValidator to validate the items.
+        """
+        super().__init__(
+            EnumValidator(enum_cls, allowed_values=allowed_values),
             delimiter=delimiter,
             max_length=max_length,
         )

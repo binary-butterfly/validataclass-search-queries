@@ -9,7 +9,12 @@ from validataclass.exceptions import ListItemsValidationError, ListLengthError
 from validataclass.validators import StringValidator, EnumValidator
 
 from tests.helpers import UnitTestEnum
-from validataclass_search_queries.validators import MultiSelectValidator, MultiSelectIntegerValidator
+from validataclass_search_queries.validators import (
+    MultiSelectValidator,
+    MultiSelectIntegerValidator,
+    MultiSelectAnyOfValidator,
+    MultiSelectEnumValidator,
+)
 
 
 # Tests for MultiSelectValidator
@@ -116,3 +121,95 @@ def test_multi_select_integer_validator_with_max_length():
     # Invalid input
     with pytest.raises(ListLengthError):
         assert validator.validate('1,2,3,4')
+
+
+# Tests for MultiSelectAnyOfValidator
+
+def test_multi_select_any_of_validator_valid_input():
+    """ Test the MultiSelectAnyOfValidator with valid input. """
+    validator = MultiSelectAnyOfValidator(['foo', 'bar', 'baz'])
+    assert validator.validate('foo,baz,bar') == ['foo', 'baz', 'bar']
+
+
+@pytest.mark.parametrize('input_data', ['', '0', 'banana'])
+def test_multi_select_any_of_validator_invalid_input(input_data):
+    """ Test the MultiSelectAnyOfValidator with invalid input. """
+    validator = MultiSelectAnyOfValidator(['foo', 'bar', 'baz'])
+    with pytest.raises(ListItemsValidationError):
+        validator.validate(input_data)
+
+
+def test_multi_select_any_of_validator_with_custom_delimiter():
+    """ Test the MultiSelectAnyOfValidator with a custom delimiter. """
+    validator = MultiSelectAnyOfValidator(['foo', 'bar', 'baz'], delimiter='|')
+
+    # Valid input
+    assert validator.validate('foo|baz') == ['foo', 'baz']
+
+    # Invalid input
+    with pytest.raises(ListItemsValidationError):
+        validator.validate('foo,bar')
+
+
+def test_multi_select_any_of_validator_with_max_length():
+    """ Test the MultiSelectAnyOfValidator with a maximum length. """
+    validator = MultiSelectAnyOfValidator(['foo', 'bar', 'baz'], max_length=2)
+
+    # Valid input
+    assert validator.validate('foo,baz') == ['foo', 'baz']
+
+    # Invalid input
+    with pytest.raises(ListLengthError):
+        assert validator.validate('foo,bar,baz')
+
+
+# Tests for MultiSelectEnumValidator
+
+def test_multi_select_enum_validator_valid_input():
+    """ Test the MultiSelectEnumValidator with valid input. """
+    validator = MultiSelectEnumValidator(UnitTestEnum)
+    assert validator.validate('foo,baz,bar') == [UnitTestEnum.FOO, UnitTestEnum.BAZ, UnitTestEnum.BAR]
+
+
+@pytest.mark.parametrize('input_data', ['', '0', 'banana'])
+def test_multi_select_enum_validator_invalid_input(input_data):
+    """ Test the MultiSelectEnumValidator with invalid input. """
+    validator = MultiSelectEnumValidator(UnitTestEnum)
+    with pytest.raises(ListItemsValidationError):
+        validator.validate(input_data)
+
+
+def test_multi_select_enum_validator_with_allowed_values():
+    """ Test the MultiSelectEnumValidator with the allowed_values parameter. """
+    validator = MultiSelectEnumValidator(UnitTestEnum, allowed_values=[UnitTestEnum.FOO])
+
+    # Valid input
+    assert validator.validate('foo,foo') == [UnitTestEnum.FOO, UnitTestEnum.FOO]
+
+    # Invalid input
+    with pytest.raises(ListItemsValidationError):
+        validator.validate('foo,bar')
+
+
+def test_multi_select_enum_validator_with_custom_delimiter():
+    """ Test the MultiSelectEnumValidator with a custom delimiter. """
+    validator = MultiSelectEnumValidator(UnitTestEnum, delimiter='|')
+
+    # Valid input
+    assert validator.validate('foo|baz') == [UnitTestEnum.FOO, UnitTestEnum.BAZ]
+
+    # Invalid input
+    with pytest.raises(ListItemsValidationError):
+        validator.validate('foo,bar')
+
+
+def test_multi_select_enum_validator_with_max_length():
+    """ Test the MultiSelectEnumValidator with a maximum length. """
+    validator = MultiSelectEnumValidator(UnitTestEnum, max_length=2)
+
+    # Valid input
+    assert validator.validate('foo,baz') == [UnitTestEnum.FOO, UnitTestEnum.BAZ]
+
+    # Invalid input
+    with pytest.raises(ListLengthError):
+        assert validator.validate('foo,bar,baz')
