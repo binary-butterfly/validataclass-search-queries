@@ -23,9 +23,9 @@ class AbstractPaginationMixin(ABC):
 
     @property
     @abstractmethod
-    def limit(self) -> int:
+    def limit(self) -> Optional[int]:
         """
-        The pagination limit (i.e. maximum number of items per page).
+        The pagination limit (i.e. maximum number of items per page), or None if pagination is disabled.
         """
         raise NotImplementedError
 

@@ -13,6 +13,7 @@ from validataclass.validators import IntegerValidator
 
 from .abstract_pagination_mixin import AbstractPaginationMixin
 from .paginated_result import PaginatedResult
+from .pagination_limit_validator import PaginationLimitValidator
 from .. import pagination, sorting
 
 __all__ = [
@@ -49,10 +50,10 @@ class CursorPaginationMixin(AbstractPaginationMixin):
         pass
     ```
 
-    The default value for "limit" is set to 20, the maximum value for "limit" is 100. To set a different default value,
-    you can simply override the `Default` object in your dataclass. Similarly, to allow values higher than 100, you
-    can override the IntegerValidator with a custom value (important: you need to set `allow_strings=True` for the
-    integer validator, because GET query parameters are always strings).
+    The default value for "limit" is set to 20, the maximum value for "limit" is 100. For this parameter, a specialized
+    validator `PaginationLimitValidator` (which is based on an `IntegerValidator`) is used. To override the default
+    and/or maximum value for "limit", you can simply override the `Default` object and/or the validator in your
+    dataclass. For example:
 
     ```
     @search_query_dataclass
@@ -61,7 +62,27 @@ class CursorPaginationMixin(AbstractPaginationMixin):
         limit: int = Default(100)
 
         # This sets a different maximum value and default:
-        limit: int = IntegerValidator(min_value=1, max_value=1000, allow_strings=True), Default(100)
+        limit: int = PaginationLimitValidator(max_value=1000), Default(100)
+    ```
+
+    By default, when you include this mixin in your dataclass, pagination is always required. This means that the user
+    will always get paginated results. To make pagination optional, you can set the parameter `optional=True` in the
+    `PaginationLimitValidator`. With this option, the validator will allow 0 and None as input, returning None in both
+    cases. This means that the user can set `limit=0` in the GET query to disable pagination (i.e. they will get all
+    results at once). You can also set `Default(None)` as the default to make pagination opt-in (meaning the user has
+    to set "limit" to some number to enable pagination).
+
+    ```
+    @search_query_dataclass
+    class ExampleSearchQuery(CursorPaginationMixin, BaseSearchQuery):
+        # Make pagination opt-out (user can set limit=0 to disable pagination)
+        limit: Optional[int] = PaginationLimitValidator(optional=True, max_value=100), Default(20)
+
+        # Make pagination opt-in (no pagination by default, user can set e.g. limit=10 to enable pagination)
+        limit: Optional[int] = PaginationLimitValidator(optional=True, max_value=100), Default(None)
+
+        # Make pagination opt-in, but don't restrict the value of limit (except for the default 32-bit integer limit)
+        limit: Optional[int] = PaginationLimitValidator(optional=True), Default(None)
     ```
     """
 
@@ -69,7 +90,7 @@ class CursorPaginationMixin(AbstractPaginationMixin):
     start: int = IntegerValidator(min_value=0, allow_strings=True), Default(0)
 
     # Limit: Number of entries per page
-    limit: int = IntegerValidator(min_value=1, max_value=100, allow_strings=True), Default(20)
+    limit: Optional[int] = PaginationLimitValidator(max_value=100), Default(20)
 
     def __init_subclass__(cls, **kwargs):
         # Pagination mixins are not compatible with each other, only one can be used at the same time
@@ -109,7 +130,11 @@ class CursorPaginationMixin(AbstractPaginationMixin):
         In the case of cursor pagination, the query is first ordered by ID, then filtered by `Model.id >= start` and
         lastly a `LIMIT ...` clause is applied.
         """
-        # The parameters should always be set, but in case they are not, set start to 0 (limit can be None)
+        # If limit is 0 or None, pagination is disabled
+        if not self.limit:
+            return query
+
+        # The start parameter should always be set, but in case it is not, default to 0
         if self.start is None:
             self.start = 0
 
@@ -134,6 +159,10 @@ class CursorPaginationMixin(AbstractPaginationMixin):
 
         In case of cursor pagination, this is the next start ID (i.e. the last ID of the current page + 1).
         """
+        # If pagination is disabled, there is no next start ID
+        if not self.limit:
+            return None
+
         # If the page is not "filled" (less results than page limit), there probably is no next page.
         if len(paginated_result) < self.limit:
             return None

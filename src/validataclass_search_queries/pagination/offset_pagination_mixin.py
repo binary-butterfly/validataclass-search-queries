@@ -12,6 +12,7 @@ from validataclass.validators import IntegerValidator
 
 from .abstract_pagination_mixin import AbstractPaginationMixin
 from .paginated_result import PaginatedResult
+from .pagination_limit_validator import PaginationLimitValidator
 from .. import pagination
 
 __all__ = [
@@ -44,10 +45,10 @@ class OffsetPaginationMixin(AbstractPaginationMixin):
         pass
     ```
 
-    The default value for "limit" is set to 20, the maximum value for "limit" is 100. To set a different default value,
-    you can simply override the `Default` object in your dataclass. Similarly, to allow values higher than 100, you
-    can override the IntegerValidator with a custom value (important: you need to set `allow_strings=True` for the
-    integer validator, because GET query parameters are always strings).
+    The default value for "limit" is set to 20, the maximum value for "limit" is 100. For this parameter, a specialized
+    validator `PaginationLimitValidator` (which is based on an `IntegerValidator`) is used. To override the default
+    and/or maximum value for "limit", you can simply override the `Default` object and/or the validator in your
+    dataclass. For example:
 
     ```
     @search_query_dataclass
@@ -56,7 +57,27 @@ class OffsetPaginationMixin(AbstractPaginationMixin):
         limit: int = Default(100)
 
         # This sets a different maximum value and default:
-        limit: int = IntegerValidator(min_value=1, max_value=1000, allow_strings=True), Default(100)
+        limit: int = PaginationLimitValidator(max_value=1000), Default(100)
+    ```
+
+    By default, when you include this mixin in your dataclass, pagination is always required. This means that the user
+    will always get paginated results. To make pagination optional, you can set the parameter `optional=True` in the
+    `PaginationLimitValidator`. With this option, the validator will allow 0 and None as input, returning None in both
+    cases. This means that the user can set `limit=0` in the GET query to disable pagination (i.e. they will get all
+    results at once). You can also set `Default(None)` as the default to make pagination opt-in (meaning the user has
+    to set "limit" to some number to enable pagination).
+
+    ```
+    @search_query_dataclass
+    class ExampleSearchQuery(OffsetPaginationMixin, BaseSearchQuery):
+        # Make pagination opt-out (user can set limit=0 to disable pagination)
+        limit: Optional[int] = PaginationLimitValidator(optional=True, max_value=100), Default(20)
+
+        # Make pagination opt-in (no pagination by default, user can set e.g. limit=10 to enable pagination)
+        limit: Optional[int] = PaginationLimitValidator(optional=True, max_value=100), Default(None)
+
+        # Make pagination opt-in, but don't restrict the value of limit (except for the default 32-bit integer limit)
+        limit: Optional[int] = PaginationLimitValidator(optional=True), Default(None)
     ```
     """
 
@@ -64,7 +85,7 @@ class OffsetPaginationMixin(AbstractPaginationMixin):
     offset: int = IntegerValidator(min_value=0, allow_strings=True), Default(0)
 
     # Limit: Number of entries per page
-    limit: int = IntegerValidator(min_value=1, max_value=100, allow_strings=True), Default(20)
+    limit: Optional[int] = PaginationLimitValidator(max_value=100), Default(20)
 
     def __init_subclass__(cls, **kwargs):
         # Pagination mixins are not compatible with each other, only one can be used at the same time
@@ -79,6 +100,10 @@ class OffsetPaginationMixin(AbstractPaginationMixin):
 
         In the case of offset pagination, a `LIMIT ... OFFSET ...` clause is applied to the query.
         """
+        # If limit is 0 or None, pagination is disabled
+        if not self.limit:
+            return query
+
         return query.offset(self.offset).limit(self.limit)
 
     def get_start_parameter_name(self) -> str:
@@ -94,6 +119,10 @@ class OffsetPaginationMixin(AbstractPaginationMixin):
 
         In case of offset pagination, this is the next offset value (i.e. the current offset value + page limit).
         """
+        # If pagination is disabled, there is no next offset
+        if not self.limit:
+            return None
+
         # As long as the next offset is smaller than the total result count, there should be a next page
         next_offset = self.offset + self.limit
         return next_offset if next_offset < paginated_result.total_count else None
