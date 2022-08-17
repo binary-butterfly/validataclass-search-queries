@@ -9,6 +9,8 @@ from typing import Any
 
 from sqlalchemy.sql import ColumnElement
 
+from .sorting_direction import SortingDirection
+
 __all__ = [
     'AbstractSortingMixin',
 ]
@@ -18,6 +20,22 @@ class AbstractSortingMixin(ABC):
     """
     Abstract base class for the sorting mixin used in search query dataclasses.
     """
+
+    @property
+    @abstractmethod
+    def sorted_by(self) -> str:
+        """
+        Name of the column that the results should be ordered by.
+        """
+        raise NotImplementedError
+
+    @property
+    @abstractmethod
+    def sorting_direction(self) -> SortingDirection:
+        """
+        Sorting direction (ascending or descending, using the `SortingDirection` enum).
+        """
+        raise NotImplementedError
 
     @abstractmethod  # pragma: nocover
     def get_order_column(self, model_cls: Any) -> ColumnElement:
