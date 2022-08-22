@@ -6,6 +6,7 @@ All rights reserved.
 
 from typing import Any
 
+from sqlalchemy.orm import Query
 from sqlalchemy.sql import ColumnElement
 from validataclass.dataclasses import validataclass, Default
 from validataclass.validators import AnyOfValidator
@@ -57,11 +58,31 @@ class SortingMixin(AbstractSortingMixin):
     # Sorting direction ("ASC" or "DESC", case-insensitive)
     sorting_direction: SortingDirection = SortingDirectionValidator(), Default(SortingDirection.ASC)
 
-    def get_order_column(self, model_cls: Any) -> ColumnElement:
+    def get_sorting_column(self, model_cls: Any) -> ColumnElement:
         """
-        Returns the column that the query should be ordered by (including the sorting direction).
+        Returns the column that the query should be ordered by (excluding the sorting direction).
 
         The "model_cls" parameter should be the class of the database model that is queried.
         """
-        sort_column: ColumnElement = getattr(model_cls, self.sorted_by)
-        return sort_column.desc() if self.sorting_direction is SortingDirection.DESC else sort_column.asc()
+        return getattr(model_cls, self.sorted_by)
+
+    def apply_sorting_direction(self, column: ColumnElement) -> ColumnElement:
+        """
+        Applies the sorting direction to an SQLAlchemy column element, i.e. `column.asc()` or `column.desc()`, and
+        returns the new column element.
+        """
+        return column.desc() if self.sorting_direction is SortingDirection.DESC else column.asc()
+
+    def apply_sorting_to_query(self, query: Query, model_cls: Any) -> Query:
+        """
+        Applies the sorting parameters to an SQLAlchemy query (`query.order_by()`) and returns the new query.
+
+        The "model_cls" parameter should be the class of the database model that is queried. It is needed to get the
+        sorting column from the model.
+        """
+        # If we want to disable sorting for some reason
+        if self.sorted_by is None:
+            return query
+
+        sorting_column = self.get_sorting_column(model_cls)
+        return query.order_by(self.apply_sorting_direction(sorting_column))

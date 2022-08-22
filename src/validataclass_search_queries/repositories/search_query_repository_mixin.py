@@ -188,7 +188,7 @@ class SearchQueryRepositoryMixin(Generic[T_Model], ABC):
         database query is returned unmodified.
         """
         if search_query and isinstance(search_query, AbstractSortingMixin):
-            return query.order_by(search_query.get_order_column(self.model_cls))
+            query = search_query.apply_sorting_to_query(query, self.model_cls)
 
         return query
 
