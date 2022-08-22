@@ -1,6 +1,6 @@
 This directory contains necessary stub files for PyCharm.
 
-To include them in PyCharm, right-click the `.stubs` directory in the project view, go to "Mark Directory as" and choose 
+To include them in PyCharm, right-click the `.stubs` directory in the project view, go to "Mark Directory as" and choose
 "Sources Root".
 
 
