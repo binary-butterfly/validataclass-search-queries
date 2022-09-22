@@ -58,7 +58,7 @@ class BaseSearchQuery:
             search_param = field.metadata.get('search_param', None)
             value = getattr(self, field.name)
 
-            if search_param and value is not None:
+            if search_param and value is not None and value is not UnsetValue:
                 # Generate tuples of parameter name and BoundSearchFilters
                 yield field.name, BoundSearchFilter(field.name, search_param, value)
 

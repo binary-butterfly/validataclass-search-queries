@@ -92,8 +92,14 @@ def test_sorting_mixin_with_validation_invalid():
     assert error.value.to_dict() == {
         'code': 'field_errors',
         'field_errors': {
-            'sorted_by': {'code': 'value_not_allowed'},
-            'sorting_direction': {'code': 'value_not_allowed'},
+            'sorted_by': {
+                'code': 'value_not_allowed',
+                'allowed_values': ['id'],
+            },
+            'sorting_direction': {
+                'code': 'value_not_allowed',
+                'allowed_values': ['ASC', 'DESC'],
+            },
         },
     }
 
