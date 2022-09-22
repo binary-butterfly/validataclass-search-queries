@@ -5,9 +5,10 @@ All rights reserved.
 """
 
 from enum import Enum
-from typing import Any, Optional, List, Type
+from typing import Any, Generic, Optional, List, Type, Iterable
 
-from validataclass.validators import ListValidator, Validator, IntegerValidator, AnyOfValidator, EnumValidator
+from validataclass.validators import Validator, ListValidator, IntegerValidator, AnyOfValidator, EnumValidator, \
+    T_ListItem, T_Enum
 
 __all__ = [
     'MultiSelectValidator',
@@ -18,7 +19,7 @@ __all__ = [
 
 
 # TODO: Base on StringToListValidator from upstream validataclass when implemented.
-class MultiSelectValidator(ListValidator):
+class MultiSelectValidator(Generic[T_ListItem], ListValidator):
     """
     Validator for multi-select search parameters.
 
@@ -66,7 +67,7 @@ class MultiSelectValidator(ListValidator):
         )
         self.delimiter = delimiter
 
-    def validate(self, input_data: Any, **kwargs) -> list:
+    def validate(self, input_data: Any, **kwargs) -> List[T_ListItem]:
         """
         Validate input data as string. Returns a validated list.
         """
@@ -77,7 +78,7 @@ class MultiSelectValidator(ListValidator):
         return super().validate(value_list, **kwargs)
 
 
-class MultiSelectIntegerValidator(MultiSelectValidator):
+class MultiSelectIntegerValidator(MultiSelectValidator[int]):
     """
     Validator for multi-select search parameters that only allows integers.
 
@@ -119,7 +120,7 @@ class MultiSelectAnyOfValidator(MultiSelectValidator):
     def __init__(
         self,
         # AnyOfValidator settings
-        allowed_values: List[Any],
+        allowed_values: Iterable[Any],
         *,
         # List settings
         delimiter: str = ',',
@@ -135,7 +136,7 @@ class MultiSelectAnyOfValidator(MultiSelectValidator):
         )
 
 
-class MultiSelectEnumValidator(MultiSelectValidator):
+class MultiSelectEnumValidator(Generic[T_Enum], MultiSelectValidator[T_Enum]):
     """
     Validator for multi-select search parameters that allows values from an Enum class.
 
@@ -147,7 +148,7 @@ class MultiSelectEnumValidator(MultiSelectValidator):
         # EnumValidator settings
         enum_cls: Type[Enum],
         *,
-        allowed_values: List[Any] = None,
+        allowed_values: Optional[Iterable[Any]] = None,
         # List settings
         delimiter: str = ',',
         max_length: Optional[int] = None,
