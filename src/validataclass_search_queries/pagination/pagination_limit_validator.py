@@ -70,7 +70,7 @@ class PaginationLimitValidator(IntegerValidator):
         )
         self.optional = optional
 
-    def validate(self, input_data: Any) -> Optional[int]:
+    def validate(self, input_data: Any, **kwargs) -> Optional[int]:
         """
         Validates the input as an integer. Returns the integer or None if the input is 0 or None.
         """
@@ -79,7 +79,7 @@ class PaginationLimitValidator(IntegerValidator):
             input_data = 0
 
         # Validate input as integer
-        validated_input = super().validate(input_data)
+        validated_input = super().validate(input_data, **kwargs)
 
         # If pagination is optional, treat 0 as "no limit" (i.e. no pagination)
         if validated_input == 0:

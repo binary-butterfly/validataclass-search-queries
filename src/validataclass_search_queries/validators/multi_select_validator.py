@@ -66,7 +66,7 @@ class MultiSelectValidator(ListValidator):
         )
         self.delimiter = delimiter
 
-    def validate(self, input_data: Any) -> list:
+    def validate(self, input_data: Any, **kwargs) -> list:
         """
         Validate input data as string. Returns a validated list.
         """
@@ -74,7 +74,7 @@ class MultiSelectValidator(ListValidator):
 
         # Split string to list and validate items
         value_list = input_data.split(self.delimiter)
-        return super().validate(value_list)
+        return super().validate(value_list, **kwargs)
 
 
 class MultiSelectIntegerValidator(MultiSelectValidator):
