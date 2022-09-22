@@ -5,7 +5,7 @@ All rights reserved.
 """
 
 from enum import Enum
-from typing import Any, Generic, Optional, List, Type, Iterable
+from typing import Any, Optional, List, Type, Iterable
 
 from validataclass.validators import Validator, ListValidator, IntegerValidator, AnyOfValidator, EnumValidator, \
     T_ListItem, T_Enum
@@ -19,7 +19,7 @@ __all__ = [
 
 
 # TODO: Base on StringToListValidator from upstream validataclass when implemented.
-class MultiSelectValidator(Generic[T_ListItem], ListValidator):
+class MultiSelectValidator(ListValidator[T_ListItem]):
     """
     Validator for multi-select search parameters.
 
@@ -136,7 +136,7 @@ class MultiSelectAnyOfValidator(MultiSelectValidator):
         )
 
 
-class MultiSelectEnumValidator(Generic[T_Enum], MultiSelectValidator[T_Enum]):
+class MultiSelectEnumValidator(MultiSelectValidator[T_Enum]):
     """
     Validator for multi-select search parameters that allows values from an Enum class.
 
