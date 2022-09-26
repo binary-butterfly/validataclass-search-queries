@@ -6,9 +6,28 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
+## [0.2.1](https://git.sectio-aurea.org/public_libraries/validataclass-search-queries/-/releases/0.2.1) - 2022-09-29
+
+[Full changelog](https://git.sectio-aurea.org/public_libraries/validataclass-search-queries/-/compare/0.2.0...0.2.1)
+
+This release improves type hinting, based on validataclass 0.7.2.
+
+### Changed
+
+- Updated validataclass dependency to version [0.7.2](https://github.com/binary-butterfly/validataclass/releases/tag/0.7.2)
+  which improves the type hinting for validataclasses and the `DataclassValidator`. [#4]
+- Improved type hinting for `@search_query_dataclass` decorator analogous to `@validataclass`. [#4]
+
+[#4]: https://git.sectio-aurea.org/public_libraries/validataclass-search-queries/-/merge_requests/4
+
+
 ## [0.2.0](https://git.sectio-aurea.org/public_libraries/validataclass-search-queries/-/releases/0.2.0) - 2022-09-22
 
 [Full changelog](https://git.sectio-aurea.org/public_libraries/validataclass-search-queries/-/compare/0.1.0...0.2.0)
+
+This release is an upgrade to validataclass 0.7.0.
+
+The previous release is not compatible to this version of validataclass, and vice-versa.
 
 ### Changed
 
@@ -23,6 +42,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.1.0](https://git.sectio-aurea.org/public_libraries/validataclass-search-queries/-/releases/0.1.0) - 2022-08-22
 
 [Full changelog](https://git.sectio-aurea.org/public_libraries/validataclass-search-queries/-/commits/0.1.0)
+
+This is the first non-alpha release of validataclass-search-queries.
 
 ### General
 
