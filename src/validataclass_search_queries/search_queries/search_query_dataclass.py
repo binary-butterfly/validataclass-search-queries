@@ -5,7 +5,7 @@ All rights reserved.
 """
 
 import dataclasses
-from typing import Any, Dict
+from typing import Any, Callable, Dict, Optional, Type, TypeVar, Union, overload
 
 from typing_extensions import dataclass_transform
 from validataclass.dataclasses import validataclass, validataclass_field, Default
@@ -17,14 +17,27 @@ __all__ = [
     'search_query_dataclass',
 ]
 
+_T = TypeVar('_T')
 
-# TODO: This special decorator can be replaced with the regular @validataclass decorator when custom field options
-#   are implemented upstream.
+
+# TODO: The special @search_query_dataclass decorator might become obsolete and replaced with the regular @validataclass
+#  decorator when custom field options are implemented in validataclass.
+
+@overload
+def search_query_dataclass(cls: Type[_T]) -> Type[_T]:
+    ...
+
+
+@overload
+def search_query_dataclass(cls: None = None, **kwargs) -> Callable[[Type[_T]], Type[_T]]:
+    ...
+
+
 @dataclass_transform(
     kw_only_default=True,
     field_specifiers=(dataclasses.field, dataclasses.Field, validataclass_field),
 )
-def search_query_dataclass(cls=None, **kwargs):
+def search_query_dataclass(cls: Optional[Type[_T]] = None, **kwargs) -> Union[Type[_T], Callable[[Type[_T]], Type[_T]]]:
     """
     Custom dataclass decorator based on @validataclass, adding support for search parameter fields.
 
@@ -42,12 +55,12 @@ def search_query_dataclass(cls=None, **kwargs):
     to set the type hints correctly, though (always use `Optional[]` unless you specified a different default).
     """
 
-    def wrap(_cls):
+    def decorator(_cls: Type[_T]) -> Type[_T]:
         _prepare_search_query_dataclass(_cls)
         return validataclass(_cls, **kwargs)
 
     # Allow decorator to be called with and without parenthesis
-    return wrap if cls is None else wrap(cls)
+    return decorator if cls is None else decorator(cls)
 
 
 def _prepare_search_query_dataclass(cls) -> None:
