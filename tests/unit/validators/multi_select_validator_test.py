@@ -147,7 +147,7 @@ def test_multi_select_any_of_validator_case_insensitive():
     assert validator.validate('FOO,bAz,bar') == ['foo', 'baz', 'BAR']
 
     # Invalid input
-    with pytest.raises(ListLengthError):
+    with pytest.raises(ListItemsValidationError):
         assert validator.validate('foo,banana')
 
 
@@ -211,7 +211,7 @@ def test_multi_select_enum_validator_case_insensitive():
     assert validator.validate('foo,BAZ,bAr') == [UnitTestEnum.FOO, UnitTestEnum.BAZ, UnitTestEnum.BAR]
 
     # Invalid input
-    with pytest.raises(ListLengthError):
+    with pytest.raises(ListItemsValidationError):
         assert validator.validate('foo,banana')
 
 
