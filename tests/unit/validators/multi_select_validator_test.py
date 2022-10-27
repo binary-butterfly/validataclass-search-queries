@@ -131,12 +131,24 @@ def test_multi_select_any_of_validator_valid_input():
     assert validator.validate('foo,baz,bar') == ['foo', 'baz', 'bar']
 
 
-@pytest.mark.parametrize('input_data', ['', '0', 'banana'])
+@pytest.mark.parametrize('input_data', ['', '0', 'banana', 'foo|bar', 'FOO'])
 def test_multi_select_any_of_validator_invalid_input(input_data):
     """ Test the MultiSelectAnyOfValidator with invalid input. """
     validator = MultiSelectAnyOfValidator(['foo', 'bar', 'baz'])
     with pytest.raises(ListItemsValidationError):
         validator.validate(input_data)
+
+
+def test_multi_select_any_of_validator_case_insensitive():
+    """ Test the MultiSelectAnyOfValidator with case_insensitive=True. """
+    validator = MultiSelectAnyOfValidator(['foo', 'BAR', 'baz'], case_insensitive=True)
+
+    # Valid input
+    assert validator.validate('FOO,bAz,bar') == ['foo', 'baz', 'BAR']
+
+    # Invalid input
+    with pytest.raises(ListLengthError):
+        assert validator.validate('foo,banana')
 
 
 def test_multi_select_any_of_validator_with_custom_delimiter():
@@ -171,7 +183,7 @@ def test_multi_select_enum_validator_valid_input():
     assert validator.validate('foo,baz,bar') == [UnitTestEnum.FOO, UnitTestEnum.BAZ, UnitTestEnum.BAR]
 
 
-@pytest.mark.parametrize('input_data', ['', '0', 'banana'])
+@pytest.mark.parametrize('input_data', ['', '0', 'banana', 'foo|bar', 'FOO'])
 def test_multi_select_enum_validator_invalid_input(input_data):
     """ Test the MultiSelectEnumValidator with invalid input. """
     validator = MultiSelectEnumValidator(UnitTestEnum)
@@ -189,6 +201,18 @@ def test_multi_select_enum_validator_with_allowed_values():
     # Invalid input
     with pytest.raises(ListItemsValidationError):
         validator.validate('foo,bar')
+
+
+def test_multi_select_enum_validator_case_insensitive():
+    """ Test the MultiSelectEnumValidator with case_insensitive=True. """
+    validator = MultiSelectEnumValidator(UnitTestEnum, case_insensitive=True)
+
+    # Valid input
+    assert validator.validate('foo,BAZ,bAr') == [UnitTestEnum.FOO, UnitTestEnum.BAZ, UnitTestEnum.BAR]
+
+    # Invalid input
+    with pytest.raises(ListLengthError):
+        assert validator.validate('foo,banana')
 
 
 def test_multi_select_enum_validator_with_custom_delimiter():
