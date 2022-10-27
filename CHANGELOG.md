@@ -6,6 +6,17 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
+## [0.2.2](https://git.sectio-aurea.org/public_libraries/validataclass-search-queries/-/releases/0.2.2) - 2022-10-27
+
+[Full changelog](https://git.sectio-aurea.org/public_libraries/validataclass-search-queries/-/compare/0.2.1...0.2.2)
+
+### Added
+
+- `MultiSelectAnyOfValidator` and `MultiSelectEnumValidator`: Add (missing) parameter `case_insensitive`. [#5]
+
+[#5]: https://git.sectio-aurea.org/public_libraries/validataclass-search-queries/-/merge_requests/5
+
+
 ## [0.2.1](https://git.sectio-aurea.org/public_libraries/validataclass-search-queries/-/releases/0.2.1) - 2022-09-29
 
 [Full changelog](https://git.sectio-aurea.org/public_libraries/validataclass-search-queries/-/compare/0.2.0...0.2.1)
