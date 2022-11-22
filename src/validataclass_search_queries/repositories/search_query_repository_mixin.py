@@ -137,7 +137,7 @@ class SearchQueryRepositoryMixin(Generic[T_Model], ABC):
 
     @property
     @abstractmethod
-    def model_cls(self) -> Type:
+    def model_cls(self) -> Type[T_Model]:
         """
         The model class used by this repository.
 

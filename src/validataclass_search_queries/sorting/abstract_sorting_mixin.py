@@ -38,7 +38,7 @@ class AbstractSortingMixin(ABC):
         """
         raise NotImplementedError
 
-    @abstractmethod  # pragma: nocover
+    @abstractmethod
     def get_sorting_column(self, model_cls: Any) -> ColumnElement:
         """
         Returns the column that the query should be ordered by (excluding the sorting direction).
@@ -47,7 +47,7 @@ class AbstractSortingMixin(ABC):
         """
         raise NotImplementedError
 
-    @abstractmethod  # pragma: nocover
+    @abstractmethod
     def apply_sorting_direction(self, column: ColumnElement) -> ColumnElement:
         """
         Applies the sorting direction to an SQLAlchemy column element, i.e. `column.asc()` or `column.desc()`, and
@@ -55,7 +55,7 @@ class AbstractSortingMixin(ABC):
         """
         raise NotImplementedError
 
-    @abstractmethod  # pragma: nocover
+    @abstractmethod
     def apply_sorting_to_query(self, query: Query, model_cls: Any) -> Query:
         """
         Applies the sorting parameters to an SQLAlchemy query (`query.order_by()`) and returns the new query.
