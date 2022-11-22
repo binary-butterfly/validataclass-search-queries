@@ -11,6 +11,7 @@ from .search_param_boolean import (
     SearchParamIsNotNone,
     SearchParamTernary,
 )
+from .search_param_custom import SearchParamCustom
 from .search_param_equals import SearchParamEquals
 from .search_param_greater_less import (
     SearchParamGreaterThan,
