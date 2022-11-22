@@ -29,7 +29,7 @@ class AbstractPaginationMixin(ABC):
         """
         raise NotImplementedError
 
-    @abstractmethod  # pragma: nocover
+    @abstractmethod
     def apply_pagination_to_query(self, query: Query, model_cls: Any) -> Query:
         """
         Applies the pagination parameters to an SQLAlchemy query and returns the new query.
@@ -41,7 +41,7 @@ class AbstractPaginationMixin(ABC):
         """
         raise NotImplementedError
 
-    @abstractmethod  # pragma: nocover
+    @abstractmethod
     def get_start_parameter_name(self) -> str:
         """
         Returns the name of the pagination start parameter (e.g. "start" for cursor pagination or "offset" for offset
@@ -49,7 +49,7 @@ class AbstractPaginationMixin(ABC):
         """
         raise NotImplementedError
 
-    @abstractmethod  # pragma: nocover
+    @abstractmethod
     def get_next_start_value(self, paginated_result: PaginatedResult) -> Optional[int]:
         """
         Returns the next value for the pagination start parameter (see also: `get_start_parameter_name()`) to retrieve
