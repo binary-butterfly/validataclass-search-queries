@@ -5,6 +5,7 @@ All rights reserved.
 """
 
 import dataclasses
+from enum import Enum
 from typing import Any, Dict, Iterator, Tuple
 
 from validataclass.helpers import UnsetValue
@@ -76,6 +77,10 @@ class BaseSearchQuery:
         for field in dataclass_fields:
             value = getattr(self, field.name)
             if value is not None and value is not UnsetValue:
+                # Convert enums to their values
+                if isinstance(value, Enum):
+                    value = value.value
+
                 data[field.name] = value
 
         return data
