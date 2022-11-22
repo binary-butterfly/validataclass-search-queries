@@ -20,7 +20,7 @@ To install the library using a regular `requirements.txt` file, add the followin
 ```
 # binary butterfly shared libraries (https://git.sectio-aurea.org/public_libraries)
 --extra-index-url https://git.sectio-aurea.org/api/v4/groups/262/-/packages/pypi/simple
-validataclass-search-queries~=0.2.0
+validataclass-search-queries~=0.3.0
 ```
 
 (**Note:** The `--extra-index-url` parameter will be used for the whole `requirements.txt` file. If you're using

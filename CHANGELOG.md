@@ -6,15 +6,36 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
+## [0.3.0](https://git.sectio-aurea.org/public_libraries/validataclass-search-queries/-/releases/0.3.0) - 2022-11-22
+
+[Full changelog](https://git.sectio-aurea.org/public_libraries/validataclass-search-queries/-/compare/0.2.2...0.3.0)
+
+### Added
+
+- `SearchParamCustom`: Special search parameter that raises an exception unless it's bypassed via a custom filter in the
+  repository. [!6]
+
+### Changed
+
+- Enums are now automatically converted to their values in `BaseSearchQuery.to_dict()`. [!7]
+
+### Fixed
+
+- Type hint for `SearchQueryRepositoryMixin.model_cls` is now `Type[T_Model]` instead of just `Type`. [!7]
+
+[!6]: https://git.sectio-aurea.org/public_libraries/validataclass-search-queries/-/merge_requests/6
+[!7]: https://git.sectio-aurea.org/public_libraries/validataclass-search-queries/-/merge_requests/7
+
+
 ## [0.2.2](https://git.sectio-aurea.org/public_libraries/validataclass-search-queries/-/releases/0.2.2) - 2022-10-27
 
 [Full changelog](https://git.sectio-aurea.org/public_libraries/validataclass-search-queries/-/compare/0.2.1...0.2.2)
 
 ### Added
 
-- `MultiSelectAnyOfValidator` and `MultiSelectEnumValidator`: Add (missing) parameter `case_insensitive`. [#5]
+- `MultiSelectAnyOfValidator` and `MultiSelectEnumValidator`: Add (missing) parameter `case_insensitive`. [!5]
 
-[#5]: https://git.sectio-aurea.org/public_libraries/validataclass-search-queries/-/merge_requests/5
+[!5]: https://git.sectio-aurea.org/public_libraries/validataclass-search-queries/-/merge_requests/5
 
 
 ## [0.2.1](https://git.sectio-aurea.org/public_libraries/validataclass-search-queries/-/releases/0.2.1) - 2022-09-29
@@ -26,10 +47,10 @@ This release improves type hinting, based on validataclass 0.7.2.
 ### Changed
 
 - Updated validataclass dependency to version [0.7.2](https://github.com/binary-butterfly/validataclass/releases/tag/0.7.2)
-  which improves the type hinting for validataclasses and the `DataclassValidator`. [#4]
-- Improved type hinting for `@search_query_dataclass` decorator analogous to `@validataclass`. [#4]
+  which improves the type hinting for validataclasses and the `DataclassValidator`. [!4]
+- Improved type hinting for `@search_query_dataclass` decorator analogous to `@validataclass`. [!4]
 
-[#4]: https://git.sectio-aurea.org/public_libraries/validataclass-search-queries/-/merge_requests/4
+[!4]: https://git.sectio-aurea.org/public_libraries/validataclass-search-queries/-/merge_requests/4
 
 
 ## [0.2.0](https://git.sectio-aurea.org/public_libraries/validataclass-search-queries/-/releases/0.2.0) - 2022-09-22
@@ -42,12 +63,12 @@ The previous release is not compatible to this version of validataclass, and vic
 
 ### Changed
 
-- Updated validataclass dependency to version [0.7.0](https://github.com/binary-butterfly/validataclass/releases/tag/0.7.0). [#3]
+- Updated validataclass dependency to version [0.7.0](https://github.com/binary-butterfly/validataclass/releases/tag/0.7.0). [!3]
   - Validators now support context-arguments.
   - MultiSelectValidators now have better type-hinting thanks to `ListValidator` and `EnumValidator` being generic now.
-- `BaseSearchQuery`: Search filters that are set to `UnsetValue` are now discarded (same as `None`). [#3]
+- `BaseSearchQuery`: Search filters that are set to `UnsetValue` are now discarded (same as `None`). [!3]
 
-[#3]: https://git.sectio-aurea.org/public_libraries/validataclass-search-queries/-/merge_requests/3
+[!3]: https://git.sectio-aurea.org/public_libraries/validataclass-search-queries/-/merge_requests/3
 
 
 ## [0.1.0](https://git.sectio-aurea.org/public_libraries/validataclass-search-queries/-/releases/0.1.0) - 2022-08-22
