@@ -250,3 +250,31 @@ customer_id: Optional[List[int]] = SearchParamMultiSelect(), MultiSelectIntegerV
 # Results in a filter like `status IN ("active", "pending")`
 status: Optional[List[str]] = SearchParamMultiSelect(), MultiSelectAnyOfValidator(['active', 'inactive', 'pending'])
 ```
+
+
+## Special filters
+
+### SearchParamCustom
+
+If you need a custom filter that is not covered by all these built-in filters, you basically have two options. The best
+way is to implement your own filter by subclassing `SearchParam` and implementing the `sqlalchemy_filter` method to
+return an appropriate SQLAlchemy filter expression.
+
+However, in some cases this isn't possible or would be unnecessarily complicated, for example if the filter is very
+specific to one model (so that a custom `SearchParam` class wouldn't be reusable anywhere else anyway) and/or applies
+a complex filter on multiple fields of that model.
+
+In those cases it's often a better option to implement your custom filter directly in the repository by overriding the
+`_apply_bound_search_filter` or `_filter_by_search_query` methods from the repository mixin. This would essentially
+bypass the `SearchParam.sqlalchemy_filter` implementation completely.
+
+For those parameters, it is recommended to define it using the `SearchParamCustom` class. This filter simply raises a
+`NotImplementedError` exception when its `sqlalchemy_filter` method is called, which ensures that the filter is never
+used without your custom implementation in the repository.
+
+**Example:**
+
+```
+# This search parameter only works if the repository handles it manually
+param: Optional[Any] = SearchParamCustom(), any_validator
+```
