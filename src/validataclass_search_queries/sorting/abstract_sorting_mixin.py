@@ -5,7 +5,7 @@ All rights reserved.
 """
 
 from abc import ABC, abstractmethod
-from typing import Any
+from typing import Any, Optional
 
 from sqlalchemy.orm import Query
 from sqlalchemy.sql import ColumnElement
@@ -22,21 +22,11 @@ class AbstractSortingMixin(ABC):
     Abstract base class for the sorting mixin used in search query dataclasses.
     """
 
-    @property
-    @abstractmethod
-    def sorted_by(self) -> str:
-        """
-        Name of the column that the results should be ordered by.
-        """
-        raise NotImplementedError
+    # Name of the column that the results should be ordered by
+    sorted_by: Optional[str]
 
-    @property
-    @abstractmethod
-    def sorting_direction(self) -> SortingDirection:
-        """
-        Sorting direction (ascending or descending, using the `SortingDirection` enum).
-        """
-        raise NotImplementedError
+    # Sorting direction (ascending or descending, using the `SortingDirection` enum)
+    sorting_direction: SortingDirection
 
     @abstractmethod
     def get_sorting_column(self, model_cls: Any) -> ColumnElement:
