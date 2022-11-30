@@ -88,7 +88,7 @@ docker-pull:
 
 .PHONY: clean
 clean:
-	rm -rf .coverage .pytest_cache reports src/*/_version.py
+	rm -rf .coverage .pytest_cache reports src/*/_version.py .tox .tox_docker .eggs src/*.egg-info venv
 
 .PHONY: clean-dist
 clean-dist:
@@ -96,4 +96,3 @@ clean-dist:
 
 .PHONY: clean-all
 clean-all: clean clean-dist
-	rm -rf .tox .tox_docker .eggs src/*.egg-info venv
