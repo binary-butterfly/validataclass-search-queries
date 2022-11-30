@@ -33,4 +33,4 @@ class SortingDirectionValidator(EnumValidator[SortingDirection]):
         The parameter "allowed_values" can be set to `[SortingDirection.ASC]` or `[SortingDirection.DESC]` to enforce a
         specific sorting direction.
         """
-        super().__init__(SortingDirection, allowed_values=allowed_values, case_insensitive=True)
+        super().__init__(SortingDirection, allowed_values=allowed_values)

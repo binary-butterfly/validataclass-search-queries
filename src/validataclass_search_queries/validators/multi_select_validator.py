@@ -121,7 +121,9 @@ class MultiSelectAnyOfValidator(MultiSelectValidator):
         self,
         # AnyOfValidator settings
         allowed_values: Iterable[Any],
-        case_insensitive: bool = False,
+        # TODO: case_insensitive is deprecated in validataclass and must be removed in a future version.
+        case_sensitive: Optional[bool] = None,
+        case_insensitive: Optional[bool] = None,
         *,
         # List settings
         delimiter: str = ',',
@@ -131,7 +133,7 @@ class MultiSelectAnyOfValidator(MultiSelectValidator):
         Create a MultiSelectValidator using a AnyOfValidator to validate the items.
         """
         super().__init__(
-            AnyOfValidator(allowed_values, case_insensitive=case_insensitive),
+            AnyOfValidator(allowed_values, case_sensitive=case_sensitive, case_insensitive=case_insensitive),
             delimiter=delimiter,
             max_length=max_length,
         )
@@ -150,7 +152,9 @@ class MultiSelectEnumValidator(MultiSelectValidator[T_Enum]):
         enum_cls: Type[Enum],
         *,
         allowed_values: Optional[Iterable[Any]] = None,
-        case_insensitive: bool = False,
+        # TODO: case_insensitive is deprecated in validataclass and must be removed in a future version.
+        case_sensitive: Optional[bool] = None,
+        case_insensitive: Optional[bool] = None,
         # List settings
         delimiter: str = ',',
         max_length: Optional[int] = None,
@@ -159,7 +163,7 @@ class MultiSelectEnumValidator(MultiSelectValidator[T_Enum]):
         Create a MultiSelectValidator using a EnumValidator to validate the items.
         """
         super().__init__(
-            EnumValidator(enum_cls, allowed_values=allowed_values, case_insensitive=case_insensitive),
+            EnumValidator(enum_cls, allowed_values=allowed_values, case_sensitive=case_sensitive, case_insensitive=case_insensitive),
             delimiter=delimiter,
             max_length=max_length,
         )

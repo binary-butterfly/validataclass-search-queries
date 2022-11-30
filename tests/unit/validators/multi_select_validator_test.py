@@ -126,12 +126,12 @@ def test_multi_select_integer_validator_with_max_length():
 # Tests for MultiSelectAnyOfValidator
 
 def test_multi_select_any_of_validator_valid_input():
-    """ Test the MultiSelectAnyOfValidator with valid input. """
-    validator = MultiSelectAnyOfValidator(['foo', 'bar', 'baz'])
-    assert validator.validate('foo,baz,bar') == ['foo', 'baz', 'bar']
+    """ Test the MultiSelectAnyOfValidator with valid input (case-insensitive). """
+    validator = MultiSelectAnyOfValidator(['foo', 'BAR', 'baz'])
+    assert validator.validate('FOO,baz,Bar') == ['foo', 'baz', 'BAR']
 
 
-@pytest.mark.parametrize('input_data', ['', '0', 'banana', 'foo|bar', 'FOO'])
+@pytest.mark.parametrize('input_data', ['', '0', 'banana', 'foo|bar'])
 def test_multi_select_any_of_validator_invalid_input(input_data):
     """ Test the MultiSelectAnyOfValidator with invalid input. """
     validator = MultiSelectAnyOfValidator(['foo', 'bar', 'baz'])
@@ -139,16 +139,18 @@ def test_multi_select_any_of_validator_invalid_input(input_data):
         validator.validate(input_data)
 
 
-def test_multi_select_any_of_validator_case_insensitive():
-    """ Test the MultiSelectAnyOfValidator with case_insensitive=True. """
-    validator = MultiSelectAnyOfValidator(['foo', 'BAR', 'baz'], case_insensitive=True)
+def test_multi_select_any_of_validator_case_sensitive_valid():
+    """ Test the MultiSelectAnyOfValidator with case_sensitive=True. """
+    validator = MultiSelectAnyOfValidator(['foo', 'BAR', 'baz'], case_sensitive=True)
+    assert validator.validate('foo,baz,BAR') == ['foo', 'baz', 'BAR']
 
-    # Valid input
-    assert validator.validate('FOO,bAz,bar') == ['foo', 'baz', 'BAR']
 
-    # Invalid input
+@pytest.mark.parametrize('input_data', ['FOO', 'bar', 'foo,BAZ'])
+def test_multi_select_any_of_validator_case_sensitive_invalid(input_data):
+    """ Test the MultiSelectAnyOfValidator with case_sensitive=True. """
+    validator = MultiSelectAnyOfValidator(['foo', 'BAR', 'baz'], case_sensitive=True)
     with pytest.raises(ListItemsValidationError):
-        assert validator.validate('foo,banana')
+        assert validator.validate(input_data)
 
 
 def test_multi_select_any_of_validator_with_custom_delimiter():
@@ -178,12 +180,12 @@ def test_multi_select_any_of_validator_with_max_length():
 # Tests for MultiSelectEnumValidator
 
 def test_multi_select_enum_validator_valid_input():
-    """ Test the MultiSelectEnumValidator with valid input. """
+    """ Test the MultiSelectEnumValidator with valid input (case-insensitive). """
     validator = MultiSelectEnumValidator(UnitTestEnum)
-    assert validator.validate('foo,baz,bar') == [UnitTestEnum.FOO, UnitTestEnum.BAZ, UnitTestEnum.BAR]
+    assert validator.validate('Foo,baz,BAR') == [UnitTestEnum.FOO, UnitTestEnum.BAZ, UnitTestEnum.BAR]
 
 
-@pytest.mark.parametrize('input_data', ['', '0', 'banana', 'foo|bar', 'FOO'])
+@pytest.mark.parametrize('input_data', ['', '0', 'banana', 'foo|bar'])
 def test_multi_select_enum_validator_invalid_input(input_data):
     """ Test the MultiSelectEnumValidator with invalid input. """
     validator = MultiSelectEnumValidator(UnitTestEnum)
@@ -203,16 +205,22 @@ def test_multi_select_enum_validator_with_allowed_values():
         validator.validate('foo,bar')
 
 
-def test_multi_select_enum_validator_case_insensitive():
-    """ Test the MultiSelectEnumValidator with case_insensitive=True. """
-    validator = MultiSelectEnumValidator(UnitTestEnum, case_insensitive=True)
-
-    # Valid input
-    assert validator.validate('foo,BAZ,bAr') == [UnitTestEnum.FOO, UnitTestEnum.BAZ, UnitTestEnum.BAR]
+def test_multi_select_enum_validator_case_sensitive_valid():
+    """ Test the MultiSelectEnumValidator with case_sensitive=True. """
+    validator = MultiSelectEnumValidator(UnitTestEnum, case_sensitive=True)
+    assert validator.validate('foo,baz,bar') == [UnitTestEnum.FOO, UnitTestEnum.BAZ, UnitTestEnum.BAR]
 
     # Invalid input
     with pytest.raises(ListItemsValidationError):
         assert validator.validate('foo,banana')
+
+
+@pytest.mark.parametrize('input_data', ['FOO', 'foo,BAZ'])
+def test_multi_select_enum_validator_case_sensitive_invalid(input_data):
+    """ Test the MultiSelectEnumValidator with case_sensitive=True. """
+    validator = MultiSelectEnumValidator(UnitTestEnum, case_sensitive=True)
+    with pytest.raises(ListItemsValidationError):
+        assert validator.validate(input_data)
 
 
 def test_multi_select_enum_validator_with_custom_delimiter():
