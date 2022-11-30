@@ -21,13 +21,8 @@ class AbstractPaginationMixin(ABC):
     Abstract base class for pagination mixins used in search query dataclasses.
     """
 
-    @property
-    @abstractmethod
-    def limit(self) -> Optional[int]:
-        """
-        The pagination limit (i.e. maximum number of items per page), or None if pagination is disabled.
-        """
-        raise NotImplementedError
+    # The pagination limit (i.e. maximum number of items per page), or None if pagination is disabled
+    limit: Optional[int]
 
     @abstractmethod
     def apply_pagination_to_query(self, query: Query, model_cls: Any) -> Query:
