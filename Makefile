@@ -1,6 +1,5 @@
 # Settings
-# NOTE: The multi-python image is a fork of fkrull/multi-python, which as of now has not been updated for Python 3.10 yet
-DOCKER_MULTI_PYTHON_IMAGE = gnufede/multi-python:focal
+DOCKER_MULTI_PYTHON_IMAGE = acidrain/multi-python:latest
 DOCKER_USER = "$(shell id -u):$(shell id -g)"
 
 # Default target
@@ -28,22 +27,22 @@ build:
 # Run complete tox suite
 .PHONY: tox
 tox:
-	tox
+	tox run
 
 # Run tox in venv (needs to be installed with `make venv` first)
 .PHONY: venv-tox
 venv-tox:
-	. venv/bin/activate && tox
+	. venv/bin/activate && tox run
 
 # Only run pytest
 .PHONY: test
 test:
-	tox -e 'clean,py{310,39,38},report'
+	tox run --skip-env flake8
 
 # Only run flake8 linter
 .PHONY: flake8
 flake8:
-	tox -e flake8
+	tox run -e flake8
 
 # Open HTML coverage report in browser
 .PHONY: open-coverage
@@ -59,10 +58,12 @@ docker-tox:
 		--workdir /code \
 		--env HOME=/tmp/home \
 		$(DOCKER_MULTI_PYTHON_IMAGE) \
-		tox --workdir .tox_docker $(TOX_ARGS)
+		tox run --workdir .tox_docker $(TOX_ARGS)
 
 # Run partial tox test suites in Docker
-.PHONY: docker-tox-py310 docker-tox-py39 docker-tox-py38
+.PHONY: docker-tox-py311 docker-tox-py310 docker-tox-py39 docker-tox-py38
+docker-tox-py311: TOX_ARGS="-e clean,py311,py311-report"
+docker-tox-py311: docker-tox
 docker-tox-py310: TOX_ARGS="-e clean,py310,py310-report"
 docker-tox-py310: docker-tox
 docker-tox-py39: TOX_ARGS="-e clean,py39,py39-report"
@@ -76,6 +77,7 @@ docker-tox-all:
 	make docker-tox-py38
 	make docker-tox-py39
 	make docker-tox-py310
+	make docker-tox-py311
 
 # Pull the latest image of the multi-python Docker image
 .PHONY: docker-pull
