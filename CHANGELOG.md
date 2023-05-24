@@ -2,8 +2,27 @@
 
 All notable changes to this project will be documented in this file.
 
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+
+## [Unreleased](https://git.sectio-aurea.org/public_libraries/validataclass-search-queries/-/compare/0.4.1...HEAD)
+
+
+## [0.4.1](https://git.sectio-aurea.org/public_libraries/validataclass-search-queries/-/releases/0.4.1) - 2023-05-24
+
+[Full changelog](https://git.sectio-aurea.org/public_libraries/validataclass-search-queries/-/compare/0.4.0...0.4.1)
+
+This release provides compatibility for [validataclass 0.9](https://github.com/binary-butterfly/validataclass/releases/tag/0.9.0)
+and thus adds official support for Python 3.11.
+
+### Dependencies
+
+- Update validataclass dependency to version [0.9.0](https://github.com/binary-butterfly/validataclass/releases/tag/0.9.0). [!10]
+  - This adds support for Python 3.11.
+- Update local test environment for tox 4. [!10]
+
+[!10]: https://git.sectio-aurea.org/public_libraries/validataclass-search-queries/-/merge_requests/10
 
 
 ## [0.4.0](https://git.sectio-aurea.org/public_libraries/validataclass-search-queries/-/releases/0.4.0) - 2022-11-30
