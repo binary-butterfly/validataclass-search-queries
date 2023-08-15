@@ -36,7 +36,7 @@ test-unit:
           - '3.9'
           - '3.10'
           - '3.11'
-      - SQLALCHEMY_VERSION:
+        SQLALCHEMY_VERSION:
           - '1.4'
           - '2.0'
   image: python:${PYTHON_VERSION}
