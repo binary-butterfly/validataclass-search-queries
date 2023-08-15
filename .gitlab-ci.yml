@@ -36,6 +36,9 @@ test-unit:
           - '3.9'
           - '3.10'
           - '3.11'
+      - SQLALCHEMY_VERSION:
+          - '1.4'
+          - '2.0'
   image: python:${PYTHON_VERSION}
   artifacts:
     when: always
@@ -47,6 +50,7 @@ test-unit:
   coverage: '/TOTAL .* (\d+%)/'
   before_script:
     - pip install --upgrade pip tox
+    - pip install SQLAlchemy~=${SQLALCHEMY_VERSION}
   script:
     # Run tests using tox with the package that was built in the build stage
     - tox run --installpkg dist/*.whl -e clean,py,flake8,report -- --junit-xml=reports/pytest_${PYTHON_VERSION}.xml
