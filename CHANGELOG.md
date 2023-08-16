@@ -8,6 +8,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased](https://git.sectio-aurea.org/public_libraries/validataclass-search-queries/-/compare/0.4.1...HEAD)
 
+Add support for SQLAlchemy 2.0.
+
 
 ## [0.4.1](https://git.sectio-aurea.org/public_libraries/validataclass-search-queries/-/releases/0.4.1) - 2023-05-24
 
