@@ -6,9 +6,21 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
-## [Unreleased](https://git.sectio-aurea.org/public_libraries/validataclass-search-queries/-/compare/0.4.1...HEAD)
+## [Unreleased](https://git.sectio-aurea.org/public_libraries/validataclass-search-queries/-/compare/0.4.2...HEAD)
+
+
+## [0.4.2](https://git.sectio-aurea.org/public_libraries/validataclass-search-queries/-/releases/0.4.2) - 2023-08-21
+
+[Full changelog](https://git.sectio-aurea.org/public_libraries/validataclass-search-queries/-/compare/0.4.1...0.4.2)
 
 Add support for SQLAlchemy 2.0.
+
+### Dependencies
+
+- Update dependencies to support SQLAlchemy 2.0. [!11]
+- Update build pipeline to test with both SQLAlchemy 1.4 and 2.0. [!11]
+
+[!11]: https://git.sectio-aurea.org/public_libraries/validataclass-search-queries/-/merge_requests/11
 
 
 ## [0.4.1](https://git.sectio-aurea.org/public_libraries/validataclass-search-queries/-/releases/0.4.1) - 2023-05-24
