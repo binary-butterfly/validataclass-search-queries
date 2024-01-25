@@ -73,8 +73,13 @@ class MultiSelectValidator(ListValidator[T_ListItem]):
         """
         self._ensure_type(input_data, str)
 
-        # Split string to list and validate items
-        value_list = input_data.split(self.delimiter)
+        if input_data == '':
+            # Parse empty string to empty list
+            value_list = []
+        else:
+            # Split string to list
+            value_list = input_data.split(self.delimiter)
+        # Validate list items
         return super().validate(value_list, **kwargs)
 
 
