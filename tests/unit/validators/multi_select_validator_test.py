@@ -6,7 +6,7 @@ All rights reserved.
 
 import pytest
 from validataclass.exceptions import ListItemsValidationError, ListLengthError
-from validataclass.validators import StringValidator, EnumValidator
+from validataclass.validators import StringValidator, EnumValidator, IntegerValidator
 
 from tests.helpers import UnitTestEnum
 from validataclass_search_queries.validators import (
@@ -25,7 +25,7 @@ from validataclass_search_queries.validators import (
         (StringValidator(min_length=1), 'foo', ['foo']),
         (StringValidator(min_length=1), 'foo,bar,baz', ['foo', 'bar', 'baz']),
 
-        (StringValidator(), '', ['']),
+        (StringValidator(), ',', ['', '']),
         (StringValidator(), 'foo,', ['foo', '']),
 
         (EnumValidator(UnitTestEnum), 'foo', [UnitTestEnum.FOO]),
@@ -41,7 +41,7 @@ def test_multi_select_validator_valid_input(item_validator, input_data, expected
 @pytest.mark.parametrize(
     'item_validator, input_data',
     [
-        (StringValidator(min_length=1), ''),
+        (StringValidator(min_length=1), ','),
         (StringValidator(min_length=1), 'foo,'),
         (StringValidator(min_length=1), 'foo,,baz'),
 
@@ -73,6 +73,26 @@ def test_multi_select_validator_with_max_length():
         assert validator.validate('a,b,c,d')
 
 
+@pytest.mark.parametrize(
+    'validator', [
+        MultiSelectValidator(StringValidator()),
+        MultiSelectValidator(IntegerValidator()),
+        MultiSelectValidator(EnumValidator(UnitTestEnum)),
+        MultiSelectIntegerValidator(),
+        MultiSelectAnyOfValidator(['foo', 'bar', 'baz']),
+        MultiSelectEnumValidator(UnitTestEnum),
+    ]
+)
+def test_multi_select_validator_invalid_empty_string_list_length_error(validator):
+    """
+    Test the MultiSelectValidator and its subclasses with an empty string as input
+    (which is parsed as an empty list and always invalid because the base ListValidator has a min_length of 1).
+    """
+    # Empty string input fails at the list length validation, regardless of item validator.
+    with pytest.raises(ListLengthError):
+        validator.validate('')
+
+
 # Tests for MultiSelectIntegerValidator
 
 @pytest.mark.parametrize(
@@ -92,7 +112,7 @@ def test_multi_select_integer_validator_valid_input(input_data, expected_result)
 @pytest.mark.parametrize(
     'input_data',
     [
-        '',
+        ',',
         'banana',
         '0',
         '11',
@@ -131,7 +151,14 @@ def test_multi_select_any_of_validator_valid_input():
     assert validator.validate('FOO,baz,Bar') == ['foo', 'baz', 'BAR']
 
 
-@pytest.mark.parametrize('input_data', ['', '0', 'banana', 'foo|bar'])
+@pytest.mark.parametrize(
+    'input_data', [
+        ',',
+        '0',
+        'banana',
+        'foo|bar',
+    ]
+)
 def test_multi_select_any_of_validator_invalid_input(input_data):
     """ Test the MultiSelectAnyOfValidator with invalid input. """
     validator = MultiSelectAnyOfValidator(['foo', 'bar', 'baz'])
@@ -185,7 +212,14 @@ def test_multi_select_enum_validator_valid_input():
     assert validator.validate('Foo,baz,BAR') == [UnitTestEnum.FOO, UnitTestEnum.BAZ, UnitTestEnum.BAR]
 
 
-@pytest.mark.parametrize('input_data', ['', '0', 'banana', 'foo|bar'])
+@pytest.mark.parametrize(
+    'input_data', [
+        ',',
+        '0',
+        'banana',
+        'foo|bar',
+    ]
+)
 def test_multi_select_enum_validator_invalid_input(input_data):
     """ Test the MultiSelectEnumValidator with invalid input. """
     validator = MultiSelectEnumValidator(UnitTestEnum)
