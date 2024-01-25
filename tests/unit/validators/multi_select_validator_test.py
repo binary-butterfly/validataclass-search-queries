@@ -70,7 +70,7 @@ def test_multi_select_validator_with_max_length():
 
     # Invalid input
     with pytest.raises(ListLengthError):
-        assert validator.validate('a,b,c,d')
+        validator.validate('a,b,c,d')
 
 
 @pytest.mark.parametrize(
@@ -140,7 +140,7 @@ def test_multi_select_integer_validator_with_max_length():
 
     # Invalid input
     with pytest.raises(ListLengthError):
-        assert validator.validate('1,2,3,4')
+        validator.validate('1,2,3,4')
 
 
 # Tests for MultiSelectAnyOfValidator
@@ -177,7 +177,7 @@ def test_multi_select_any_of_validator_case_sensitive_invalid(input_data):
     """ Test the MultiSelectAnyOfValidator with case_sensitive=True. """
     validator = MultiSelectAnyOfValidator(['foo', 'BAR', 'baz'], case_sensitive=True)
     with pytest.raises(ListItemsValidationError):
-        assert validator.validate(input_data)
+        validator.validate(input_data)
 
 
 def test_multi_select_any_of_validator_with_custom_delimiter():
@@ -201,7 +201,7 @@ def test_multi_select_any_of_validator_with_max_length():
 
     # Invalid input
     with pytest.raises(ListLengthError):
-        assert validator.validate('foo,bar,baz')
+        validator.validate('foo,bar,baz')
 
 
 # Tests for MultiSelectEnumValidator
@@ -246,7 +246,7 @@ def test_multi_select_enum_validator_case_sensitive_valid():
 
     # Invalid input
     with pytest.raises(ListItemsValidationError):
-        assert validator.validate('foo,banana')
+        validator.validate('foo,banana')
 
 
 @pytest.mark.parametrize('input_data', ['FOO', 'foo,BAZ'])
@@ -254,7 +254,7 @@ def test_multi_select_enum_validator_case_sensitive_invalid(input_data):
     """ Test the MultiSelectEnumValidator with case_sensitive=True. """
     validator = MultiSelectEnumValidator(UnitTestEnum, case_sensitive=True)
     with pytest.raises(ListItemsValidationError):
-        assert validator.validate(input_data)
+        validator.validate(input_data)
 
 
 def test_multi_select_enum_validator_with_custom_delimiter():
@@ -278,4 +278,4 @@ def test_multi_select_enum_validator_with_max_length():
 
     # Invalid input
     with pytest.raises(ListLengthError):
-        assert validator.validate('foo,bar,baz')
+        validator.validate('foo,bar,baz')
