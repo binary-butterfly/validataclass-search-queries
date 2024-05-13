@@ -24,7 +24,7 @@ build:
 # Test suite
 # ----------
 
-# Run complete tox suite
+# Run complete tox suite with local Python interpreter
 .PHONY: tox
 tox:
 	tox run
@@ -37,7 +37,7 @@ venv-tox:
 # Only run pytest
 .PHONY: test
 test:
-	tox run --skip-env flake8
+	tox run -e clean,py,report
 
 # Only run flake8 linter
 .PHONY: flake8
@@ -61,35 +61,45 @@ docker-tox:
 		tox run --workdir .tox_docker $(TOX_ARGS)
 
 # Run partial tox test suites in Docker
-.PHONY: docker-tox-py311-sqlalchemy1.4 docker-tox-py310-sqlalchemy1.4 docker-tox-py39-sqlalchemy1.4 docker-tox-py38-sqlalchemy1.4 docker-tox-py311-sqlalchemy2.0 docker-tox-py310-sqlalchemy2.0 docker-tox-py39-sqlalchemy2.0 docker-tox-py38-sqlalchemy2.0
-docker-tox-py311-sqlalchemy1.4: TOX_ARGS="-e clean,py311,py311-report,sqlalchemy1.4"
-docker-tox-py311-sqlalchemy1.4: docker-tox
-docker-tox-py310-sqlalchemy1.4: TOX_ARGS="-e clean,py310,py310-report,sqlalchemy1.4"
-docker-tox-py310-sqlalchemy1.4: docker-tox
-docker-tox-py39-sqlalchemy1.4: TOX_ARGS="-e clean,py39,py39-report,sqlalchemy1.4"
-docker-tox-py39-sqlalchemy1.4: docker-tox
-docker-tox-py38-sqlalchemy1.4: TOX_ARGS="-e clean,py38,py38-report,sqlalchemy1.4"
-docker-tox-py38-sqlalchemy1.4: docker-tox
-docker-tox-py311-sqlalchemy2.0: TOX_ARGS="-e clean,py311,py311-report,sqlalchemy2.0"
-docker-tox-py311-sqlalchemy2.0: docker-tox
-docker-tox-py310-sqlalchemy2.0: TOX_ARGS="-e clean,py310,py310-report,sqlalchemy2.0"
-docker-tox-py310-sqlalchemy2.0: docker-tox
-docker-tox-py39-sqlalchemy2.0: TOX_ARGS="-e clean,py39,py39-report,sqlalchemy2.0"
-docker-tox-py39-sqlalchemy2.0: docker-tox
-docker-tox-py38-sqlalchemy2.0: TOX_ARGS="-e clean,py38,py38-report,sqlalchemy2.0"
-docker-tox-py38-sqlalchemy2.0: docker-tox
+.PHONY: docker-test-py312-sqlalchemy1.4 docker-test-py312-sqlalchemy2.0 \
+		docker-test-py311-sqlalchemy1.4 docker-test-py311-sqlalchemy2.0 \
+		docker-test-py310-sqlalchemy1.4 docker-test-py310-sqlalchemy2.0 \
+		docker-test-py39-sqlalchemy1.4 docker-test-py39-sqlalchemy2.0 \
+		docker-test-py38-sqlalchemy1.4 docker-test-py38-sqlalchemy2.0
+docker-test-py312-sqlalchemy1.4: TOX_ARGS="-e clean,py312,py312-report,sqlalchemy1.4"
+docker-test-py312-sqlalchemy1.4: docker-tox
+docker-test-py312-sqlalchemy2.0: TOX_ARGS="-e clean,py312,py312-report,sqlalchemy2.0"
+docker-test-py312-sqlalchemy2.0: docker-tox
+docker-test-py311-sqlalchemy1.4: TOX_ARGS="-e clean,py311,py311-report,sqlalchemy1.4"
+docker-test-py311-sqlalchemy1.4: docker-tox
+docker-test-py311-sqlalchemy2.0: TOX_ARGS="-e clean,py311,py311-report,sqlalchemy2.0"
+docker-test-py311-sqlalchemy2.0: docker-tox
+docker-test-py310-sqlalchemy1.4: TOX_ARGS="-e clean,py310,py310-report,sqlalchemy1.4"
+docker-test-py310-sqlalchemy1.4: docker-tox
+docker-test-py310-sqlalchemy2.0: TOX_ARGS="-e clean,py310,py310-report,sqlalchemy2.0"
+docker-test-py310-sqlalchemy2.0: docker-tox
+docker-test-py39-sqlalchemy1.4: TOX_ARGS="-e clean,py39,py39-report,sqlalchemy1.4"
+docker-test-py39-sqlalchemy1.4: docker-tox
+docker-test-py39-sqlalchemy2.0: TOX_ARGS="-e clean,py39,py39-report,sqlalchemy2.0"
+docker-test-py39-sqlalchemy2.0: docker-tox
+docker-test-py38-sqlalchemy1.4: TOX_ARGS="-e clean,py38,py38-report,sqlalchemy1.4"
+docker-test-py38-sqlalchemy1.4: docker-tox
+docker-test-py38-sqlalchemy2.0: TOX_ARGS="-e clean,py38,py38-report,sqlalchemy2.0"
+docker-test-py38-sqlalchemy2.0: docker-tox
 
 # Run all tox test suites, but separately to check code coverage individually
-.PHONY: docker-tox-all
-docker-tox-all:
-	make docker-tox-py38-sqlalchemy1.4
-	make docker-tox-py39-sqlalchemy1.4
-	make docker-tox-py310-sqlalchemy1.4
-	make docker-tox-py311-sqlalchemy1.4
-	make docker-tox-py38-sqlalchemy2.0
-	make docker-tox-py39-sqlalchemy2.0
-	make docker-tox-py310-sqlalchemy2.0
-	make docker-tox-py311-sqlalchemy2.0
+.PHONY: docker-test-all
+docker-test-all:
+	make docker-test-py38-sqlalchemy1.4
+	make docker-test-py39-sqlalchemy1.4
+	make docker-test-py310-sqlalchemy1.4
+	make docker-test-py311-sqlalchemy1.4
+	make docker-test-py312-sqlalchemy1.4
+	make docker-test-py38-sqlalchemy2.0
+	make docker-test-py39-sqlalchemy2.0
+	make docker-test-py310-sqlalchemy2.0
+	make docker-test-py311-sqlalchemy2.0
+	make docker-test-py312-sqlalchemy2.0
 
 # Pull the latest image of the multi-python Docker image
 .PHONY: docker-pull
