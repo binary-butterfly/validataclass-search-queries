@@ -6,7 +6,33 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
-## [Unreleased](https://git.sectio-aurea.org/public_libraries/validataclass-search-queries/-/compare/0.4.2...HEAD)
+## [Unreleased](https://git.sectio-aurea.org/public_libraries/validataclass-search-queries/-/compare/0.5.0...HEAD)
+
+
+## [0.5.0](https://git.sectio-aurea.org/public_libraries/validataclass-search-queries/-/releases/0.5.0) - 2024-05-15
+
+[Full changelog](https://git.sectio-aurea.org/public_libraries/validataclass-search-queries/-/compare/0.4.2...0.5.0)
+
+This release mostly updates the dependency on validataclass to version 0.10.0.
+
+Also, this library is now licensed under an MIT license to be compatible with FOSS projects.
+
+### Changed
+
+- `MultiSelectValidator`: Empty strings are now parsed as empty lists. [!13] 
+
+### Dependencies
+
+- Update validataclass dependency to version [0.10.0](https://github.com/binary-butterfly/validataclass/releases/tag/0.10.0). [!14]
+- Add support and test environment for Python 3.12. [!14]
+
+### Miscellaneous
+
+- Change project license to MIT. [!15]
+
+[!13]: https://git.sectio-aurea.org/public_libraries/validataclass-search-queries/-/merge_requests/13
+[!14]: https://git.sectio-aurea.org/public_libraries/validataclass-search-queries/-/merge_requests/14
+[!15]: https://git.sectio-aurea.org/public_libraries/validataclass-search-queries/-/merge_requests/15
 
 
 ## [0.4.2](https://git.sectio-aurea.org/public_libraries/validataclass-search-queries/-/releases/0.4.2) - 2023-08-21
