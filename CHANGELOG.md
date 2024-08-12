@@ -9,6 +9,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased](https://git.sectio-aurea.org/public_libraries/validataclass-search-queries/-/compare/0.5.0...HEAD)
 
 
+## [0.5.1](https://git.sectio-aurea.org/public_libraries/validataclass-search-queries/-/releases/0.5.1) - 2024-08-12
+
+[Full changelog](https://git.sectio-aurea.org/public_libraries/validataclass-search-queries/-/compare/0.5.0...0.5.1)
+
+This release only adds compatibility with validataclass 0.11.0.
+
+### Dependencies
+
+- Add compatibility for [validataclass 0.11.0]. [!17]
+
+[!17]: https://git.sectio-aurea.org/public_libraries/validataclass-search-queries/-/merge_requests/17
+[validataclass 0.11.0]: https://github.com/binary-butterfly/validataclass/releases/tag/0.11.0
+
+
 ## [0.5.0](https://git.sectio-aurea.org/public_libraries/validataclass-search-queries/-/releases/0.5.0) - 2024-05-15
 
 [Full changelog](https://git.sectio-aurea.org/public_libraries/validataclass-search-queries/-/compare/0.4.2...0.5.0)
