@@ -65,9 +65,19 @@ _docker-tox:
 docker-tox: _docker-tox
 
 # Run partial tox test suites in Docker
-.PHONY: docker-test-py312-sqlalchemy1.4 docker-test-py312-sqlalchemy2.0 \
+.PHONY: docker-test-py314-sqlalchemy1.4 docker-test-py314-sqlalchemy2.0 \
+		docker-test-py313-sqlalchemy1.4 docker-test-py313-sqlalchemy2.0 \
+		docker-test-py312-sqlalchemy1.4 docker-test-py312-sqlalchemy2.0 \
 		docker-test-py311-sqlalchemy1.4 docker-test-py311-sqlalchemy2.0 \
 		docker-test-py310-sqlalchemy1.4 docker-test-py310-sqlalchemy2.0
+docker-test-py314-sqlalchemy1.4: TOX_ARGS="-e clean,py314-sqlalchemy1.4,py312-report"
+docker-test-py314-sqlalchemy1.4: _docker-tox
+docker-test-py314-sqlalchemy2.0: TOX_ARGS="-e clean,py314-sqlalchemy2.0,py312-report"
+docker-test-py314-sqlalchemy2.0: _docker-tox
+docker-test-py313-sqlalchemy1.4: TOX_ARGS="-e clean,py313-sqlalchemy1.4,py312-report"
+docker-test-py313-sqlalchemy1.4: _docker-tox
+docker-test-py313-sqlalchemy2.0: TOX_ARGS="-e clean,py313-sqlalchemy2.0,py312-report"
+docker-test-py313-sqlalchemy2.0: _docker-tox
 docker-test-py312-sqlalchemy1.4: TOX_ARGS="-e clean,py312-sqlalchemy1.4,py312-report"
 docker-test-py312-sqlalchemy1.4: _docker-tox
 docker-test-py312-sqlalchemy2.0: TOX_ARGS="-e clean,py312-sqlalchemy2.0,py312-report"
@@ -90,6 +100,10 @@ docker-test-all:
 	make docker-test-py311-sqlalchemy2.0
 	make docker-test-py312-sqlalchemy1.4
 	make docker-test-py312-sqlalchemy2.0
+	make docker-test-py313-sqlalchemy1.4
+	make docker-test-py313-sqlalchemy2.0
+	make docker-test-py314-sqlalchemy1.4
+	make docker-test-py314-sqlalchemy2.0
 
 # Pull the latest image of the multi-python Docker image
 .PHONY: docker-pull
