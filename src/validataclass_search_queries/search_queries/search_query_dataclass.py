@@ -30,7 +30,7 @@ def search_query_dataclass(cls: type[_T]) -> type[_T]:
 
 
 @overload
-def search_query_dataclass(cls: None = None, **kwargs) -> Callable[[type[_T]], type[_T]]:
+def search_query_dataclass(cls: None = None, /, **kwargs) -> Callable[[type[_T]], type[_T]]:
     ...
 
 
@@ -40,6 +40,7 @@ def search_query_dataclass(cls: None = None, **kwargs) -> Callable[[type[_T]], t
 )
 def search_query_dataclass(
     cls: type[_T] | None = None,
+    /,
     **kwargs: Any,
 ) -> type[_T] | Callable[[type[_T]], type[_T]]:
     """
