@@ -4,7 +4,8 @@ Copyright (c) 2022, binary butterfly GmbH and contributors
 Use of this source code is governed by an MIT-style license that can be found in the LICENSE file.
 """
 
-from typing import List, TypeVar, Callable, Iterable
+from collections.abc import Callable, Iterable
+from typing import TypeVar
 
 __all__ = [
     'PaginatedResult',
@@ -16,7 +17,7 @@ T_Result = TypeVar('T_Result')
 T_MappedResult = TypeVar('T_MappedResult')
 
 
-class PaginatedResult(List[T_Result]):
+class PaginatedResult(list[T_Result]):
     """
     Custom list type for paginated database query results.
 

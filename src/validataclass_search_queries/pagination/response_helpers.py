@@ -4,7 +4,7 @@ Copyright (c) 2022, binary butterfly GmbH and contributors
 Use of this source code is governed by an MIT-style license that can be found in the LICENSE file.
 """
 
-from typing import Optional, Any
+from typing import Any
 
 from .abstract_pagination_mixin import AbstractPaginationMixin
 from .paginated_result import PaginatedResult
@@ -17,11 +17,11 @@ __all__ = [
 
 def paginated_api_response(
     paginated_result: PaginatedResult[Any],
-    search_query: Optional[BaseSearchQuery],
+    search_query: BaseSearchQuery | None,
     *,
     recursive_to_dict: bool = True,
-    request_path: Optional[str] = None,
-    original_params: Optional[dict] = None,
+    request_path: str | None = None,
+    original_params: dict | None = None,
 ) -> dict:
     """
     Constructs a REST API response (as a dictionary) for paginated results.

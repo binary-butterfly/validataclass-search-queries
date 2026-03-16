@@ -136,7 +136,7 @@ page with unlimited results, so to speak). There might not even be a search quer
 everything will still work fine.
 
 Because of this, it is recommended to define your fetch methods with an **optional** `search_query` parameter (like
-`search_query: Optional[BaseSearchQuery] = None`).
+`search_query: BaseSearchQuery | None = None`).
 
 Last but not least, there is another repository method provided by the mixin: `_search_and_paginate()` is a shortcut
 method that calls all of the other methods shown above, so it applies filters, sorting, pagination and returns a
@@ -145,8 +145,6 @@ method that calls all of the other methods shown above, so it applies filters, s
 Here is a full example for a repository class that makes use of search queries:
 
 ```python
-from typing import Optional
-
 from sqlalchemy.orm import Session
 from validataclass_search_queries.pagination import PaginatedResult
 from validataclass_search_queries.repositories import SearchQueryRepositoryMixin
@@ -168,7 +166,7 @@ class ExampleRepository(SearchQueryRepositoryMixin[ExampleModel]):
         self.session = session
 
     # Example for a fetch method that filters, sorts and paginates by search query
-    def fetch_examples(self, *, search_query: Optional[BaseSearchQuery] = None) -> PaginatedResult[ExampleModel]:
+    def fetch_examples(self, *, search_query: BaseSearchQuery | None = None) -> PaginatedResult[ExampleModel]:
         # Create an SQLAlchemy query
         query = self.session.query(ExampleModel)
 
@@ -199,8 +197,6 @@ handle your special filter, and then continue using the methods like you would n
 Here is an example how you could implement this:
 
 ```python
-from typing import Optional
-
 from sqlalchemy.orm import Session, Query
 from validataclass.validators import StringValidator
 from validataclass_search_queries.filters import SearchParamContains, BoundSearchFilter
@@ -209,17 +205,17 @@ from validataclass_search_queries.repositories import SearchQueryRepositoryMixin
 from validataclass_search_queries.search_queries import search_query_dataclass, BaseSearchQuery
 
 # Stubs for SQLAlchemy models (Customer needs a 1:n relationship "addresses" to Address)
-class Customer: pass
-class Address: pass
+class Customer: ...
+class Address: ...
 
 # Search query dataclass with filters
 @search_query_dataclass
 class CustomerSearchQuery(BaseSearchQuery):
     # Regular search filter on name (part of the customer)
-    name: Optional[str] = SearchParamContains(), StringValidator()
+    name: str | None = SearchParamContains(), StringValidator()
 
     # Search filter on the city (part of an address, not the customer)
-    city: Optional[str] = SearchParamContains(), StringValidator()
+    city: str | None = SearchParamContains(), StringValidator()
 
 
 class CustomerRepository(SearchQueryRepositoryMixin[Customer]):
@@ -230,7 +226,7 @@ class CustomerRepository(SearchQueryRepositoryMixin[Customer]):
     def __init__(self, *, session: Session):
         self.session = session
 
-    def fetch_customers(self, *, search_query: Optional[BaseSearchQuery] = None) -> PaginatedResult[Customer]:
+    def fetch_customers(self, *, search_query: BaseSearchQuery | None = None) -> PaginatedResult[Customer]:
         # Create a customer query, and join it with the addresses
         query = self.session.query(Customer).join(Customer.addresses)
         return self._search_and_paginate(query, search_query)

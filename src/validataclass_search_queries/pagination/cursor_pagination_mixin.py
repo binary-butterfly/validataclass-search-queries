@@ -4,7 +4,7 @@ Copyright (c) 2022, binary butterfly GmbH and contributors
 Use of this source code is governed by an MIT-style license that can be found in the LICENSE file.
 """
 
-from typing import Any, Optional
+from typing import Any
 
 from sqlalchemy.orm import Query
 from sqlalchemy.sql import ColumnElement
@@ -76,13 +76,13 @@ class CursorPaginationMixin(AbstractPaginationMixin):
     @search_query_dataclass
     class ExampleSearchQuery(CursorPaginationMixin, BaseSearchQuery):
         # Make pagination opt-out (user can set limit=0 to disable pagination)
-        limit: Optional[int] = PaginationLimitValidator(optional=True, max_value=100), Default(20)
+        limit: int | None = PaginationLimitValidator(optional=True, max_value=100), Default(20)
 
         # Make pagination opt-in (no pagination by default, user can set e.g. limit=10 to enable pagination)
-        limit: Optional[int] = PaginationLimitValidator(optional=True, max_value=100), Default(None)
+        limit: int | None = PaginationLimitValidator(optional=True, max_value=100), Default(None)
 
         # Make pagination opt-in, but don't restrict the value of limit (except for the default 32-bit integer limit)
-        limit: Optional[int] = PaginationLimitValidator(optional=True), Default(None)
+        limit: int | None = PaginationLimitValidator(optional=True), Default(None)
     ```
     """
 
@@ -90,7 +90,7 @@ class CursorPaginationMixin(AbstractPaginationMixin):
     start: int = IntegerValidator(min_value=0, allow_strings=True), Default(0)
 
     # Limit: Number of entries per page
-    limit: Optional[int] = PaginationLimitValidator(max_value=100), Default(20)
+    limit: int | None = PaginationLimitValidator(max_value=100), Default(20)
 
     def __init_subclass__(cls, **kwargs):
         # Pagination mixins are not compatible with each other, only one can be used at the same time
@@ -152,7 +152,7 @@ class CursorPaginationMixin(AbstractPaginationMixin):
         """
         return 'start'
 
-    def get_next_start_value(self, paginated_result: PaginatedResult) -> Optional[int]:
+    def get_next_start_value(self, paginated_result: PaginatedResult) -> int | None:
         """
         Returns the next value for the pagination start parameter to retrieve the next page of data, or None if there
         is no next page.

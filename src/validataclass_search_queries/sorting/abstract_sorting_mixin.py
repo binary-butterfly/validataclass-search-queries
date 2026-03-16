@@ -5,7 +5,7 @@ Use of this source code is governed by an MIT-style license that can be found in
 """
 
 from abc import ABC, abstractmethod
-from typing import Any, Optional
+from typing import Any
 
 from sqlalchemy.orm import Query
 from sqlalchemy.sql import ColumnElement
@@ -23,7 +23,7 @@ class AbstractSortingMixin(ABC):
     """
 
     # Name of the column that the results should be ordered by
-    sorted_by: Optional[str]
+    sorted_by: str | None
 
     # Sorting direction (ascending or descending, using the `SortingDirection` enum)
     sorting_direction: SortingDirection

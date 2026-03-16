@@ -5,7 +5,7 @@ Use of this source code is governed by an MIT-style license that can be found in
 """
 
 from abc import ABC, abstractmethod
-from typing import Optional, Generic, Type, TypeVar
+from typing import Generic, TypeVar
 
 from sqlalchemy.orm import Query
 
@@ -72,7 +72,7 @@ class SearchQueryRepositoryMixin(Generic[T_Model], ABC):
             self.session = session
 
         # Example for a fetch method that filters, sorts and paginates by search query
-        def fetch_examples(self, *, search_query: Optional[BaseSearchQuery] = None) -> PaginatedResult[Example]:
+        def fetch_examples(self, *, search_query: BaseSearchQuery | None = None) -> PaginatedResult[Example]:
             query = self.session.query(Example)
             return self._search_and_paginate(query, search_query)
     ```
@@ -108,7 +108,7 @@ class SearchQueryRepositoryMixin(Generic[T_Model], ABC):
 
         # (__init__(): see other example above)
 
-        def fetch_customers(self, *, search_query: Optional[BaseSearchQuery] = None) -> PaginatedResult[Customer]:
+        def fetch_customers(self, *, search_query: BaseSearchQuery | None = None) -> PaginatedResult[Customer]:
             # We need to JOIN the Customer query with the Address model via the shipping_address relation
             query = self.session.query(Customer).join(Customer.shipping_address)
             return self._search_and_paginate(query, search_query)
@@ -137,7 +137,7 @@ class SearchQueryRepositoryMixin(Generic[T_Model], ABC):
 
     @property
     @abstractmethod
-    def model_cls(self) -> Type[T_Model]:
+    def model_cls(self) -> type[T_Model]:
         """
         The model class used by this repository.
 
@@ -145,7 +145,7 @@ class SearchQueryRepositoryMixin(Generic[T_Model], ABC):
         """
         raise NotImplementedError
 
-    def _search_and_paginate(self, query: Query, search_query: Optional[BaseSearchQuery]) -> PaginatedResult[T_Model]:
+    def _search_and_paginate(self, query: Query, search_query: BaseSearchQuery | None) -> PaginatedResult[T_Model]:
         """
         Filters a query based on search parameters (usually parsed from HTTP query parameters) and paginates the result.
 
@@ -155,7 +155,7 @@ class SearchQueryRepositoryMixin(Generic[T_Model], ABC):
         query = self._order_by_search_query(query, search_query)
         return self._paginate_result(query, search_query)
 
-    def _filter_by_search_query(self, query: Query, search_query: Optional[BaseSearchQuery]) -> Query:
+    def _filter_by_search_query(self, query: Query, search_query: BaseSearchQuery | None) -> Query:
         """
         Filters a query based on search parameters (usually parsed from HTTP query parameters), *excluding* pagination.
 
@@ -180,7 +180,7 @@ class SearchQueryRepositoryMixin(Generic[T_Model], ABC):
         col = getattr(self.model_cls, bound_filter.column_name)
         return query.filter(bound_filter.get_sqlalchemy_filter(col))
 
-    def _order_by_search_query(self, query: Query, search_query: Optional[BaseSearchQuery]) -> Query:
+    def _order_by_search_query(self, query: Query, search_query: BaseSearchQuery | None) -> Query:
         """
         Applies sorting (order_by) to a query based on sorting parameters from a search query.
 
@@ -192,7 +192,7 @@ class SearchQueryRepositoryMixin(Generic[T_Model], ABC):
 
         return query
 
-    def _paginate_result(self, query: Query, search_query: Optional[BaseSearchQuery]) -> PaginatedResult[T_Model]:
+    def _paginate_result(self, query: Query, search_query: BaseSearchQuery | None) -> PaginatedResult[T_Model]:
         """
         Applies pagination to a query based on search parameters, executes the query and returns a paginated result list.
 

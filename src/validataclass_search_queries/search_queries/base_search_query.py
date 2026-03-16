@@ -5,8 +5,9 @@ Use of this source code is governed by an MIT-style license that can be found in
 """
 
 import dataclasses
+from collections.abc import Iterator
 from enum import Enum
-from typing import Any, Dict, Iterator, Tuple
+from typing import Any
 
 from validataclass.helpers import UnsetValue
 
@@ -34,15 +35,15 @@ class BaseSearchQuery:
     @search_query_dataclass
     class MySearchQuery(BaseSearchQuery):
         # Search for a concrete name (parameter name equals column name, so it doesn't need to be specified)
-        name: Optional[str] = SearchParamEquals(), StringValidator()
+        name: str | None = SearchParamEquals(), StringValidator()
 
         # Filter objects by modification date (based on the 'modified' column)
-        modified_since: Optional[datetime] = SearchParamSince('modified'), DateTimeValidator()
-        modified_until: Optional[datetime] = SearchParamUntil('modified'), DateTimeValidator()
+        modified_since: datetime | None = SearchParamSince('modified'), DateTimeValidator()
+        modified_until: datetime | None = SearchParamUntil('modified'), DateTimeValidator()
     ```
     """
 
-    def get_search_filters(self) -> Iterator[Tuple[str, BoundSearchFilter]]:
+    def get_search_filters(self) -> Iterator[tuple[str, BoundSearchFilter]]:
         """
         Returns an iterator that instantiates BoundSearchFilters for all search parameters in this class that are set
         by the user (i.e. not None).
@@ -63,7 +64,7 @@ class BaseSearchQuery:
                 # Generate tuples of parameter name and BoundSearchFilters
                 yield field.name, BoundSearchFilter(field.name, search_param, value)
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """
         Returns the data of all fields that are set in the dataclass as a dictionary, i.e. all fields with values other
         than None or UnsetValue.

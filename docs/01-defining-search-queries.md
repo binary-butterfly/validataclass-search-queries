@@ -55,7 +55,7 @@ To define a search parameter in a search query dataclass, you need to specify a 
 validator (as a tuple, similar to how you would define a field with a validator and a default in a validataclass):
 
 ```
-example_field: Optional[str] = SearchParamEquals('example_column'), StringValidator()
+example_field: str | None = SearchParamEquals('example_column'), StringValidator()
 ```
 
 This would define a search parameter with the name `example_field`, which is validated using a `StringValidator`, and
@@ -66,11 +66,11 @@ In most cases, the parameter name will be the same as the column name. In that c
 the following lines are equivalent:
 
 ```
-name: Optional[str] = SearchParamEquals(), StringValidator()
-name: Optional[str] = SearchParamEquals('name'), StringValidator()
+name: str | None = SearchParamEquals(), StringValidator()
+name: str | None = SearchParamEquals('name'), StringValidator()
 ```
 
-You might have noticed something about this field definition: The field is defined as `Optional[str]`, but there is no
+You might have noticed something about this field definition: The field is defined as `str | None`, but there is no
 default specified. This is a small specialty of the `@search_query_dataclass` decorator: Unless a `Default` is specified
 explicitly, every field with a `SearchParam` will automatically use `Default(None)` as the default.
 
@@ -107,7 +107,6 @@ Here is a full example of a search query dataclass:
 
 ```python
 from datetime import datetime
-from typing import Optional, List
 
 from validataclass.validators import DateTimeValidator, IntegerValidator, StringValidator
 from validataclass_search_queries.filters import SearchParamContains, SearchParamEquals, SearchParamSince, \
@@ -118,21 +117,21 @@ from validataclass_search_queries.validators import MultiSelectAnyOfValidator
 @search_query_dataclass
 class ExampleSearchQuery(BaseSearchQuery):
     # Filter for a substring search on the "name" column
-    name: Optional[str] = SearchParamContains(), StringValidator()
+    name: str | None = SearchParamContains(), StringValidator()
 
     # Filter for all results where "customer_id" has the specified value
     # (Note: For validation of integers, remember to set allow_strings=True.)
-    customer_id: Optional[int] = SearchParamEquals(), IntegerValidator(allow_strings=True)
+    customer_id: int | None = SearchParamEquals(), IntegerValidator(allow_strings=True)
 
     # Two filters on the same column "created_at" to filter for all results created between created_since
     # and created_until. (Both fields can be used alone, too.)
-    created_since: Optional[datetime] = SearchParamSince('created_at'), DateTimeValidator()
-    created_until: Optional[datetime] = SearchParamUntil('created_at'), DateTimeValidator()
+    created_since: datetime | None = SearchParamSince('created_at'), DateTimeValidator()
+    created_until: datetime | None = SearchParamUntil('created_at'), DateTimeValidator()
 
     # Multi-select field: Parameter can be set to a comma-separated list of multiple values. The query will
     # fetch all results where the specified column has one of the given values. A special validator is required
     # here to parse the comma-separated list of values.
-    status: Optional[List[str]] = SearchParamMultiSelect(), MultiSelectAnyOfValidator(['active', 'inactive', 'pending'])
+    status: list[str] | None = SearchParamMultiSelect(), MultiSelectAnyOfValidator(['active', 'inactive', 'pending'])
 ```
 
 
@@ -217,8 +216,6 @@ for `limit` is a `PaginationLimitValidator`, which is a specialized version of a
 **Examples:**
 
 ```python
-from typing import Optional
-
 from validataclass.dataclasses import Default
 from validataclass_search_queries.pagination import CursorPaginationMixin, PaginationLimitValidator
 from validataclass_search_queries.search_queries import search_query_dataclass, BaseSearchQuery
@@ -227,10 +224,10 @@ from validataclass_search_queries.search_queries import search_query_dataclass, 
 class ExampleSearchQuery(CursorPaginationMixin, BaseSearchQuery):
     # To change both the maximum limit (default: 100) and default limit (20), override both validator and default.
     # (You can also omit `max_value` to allow any positive value for limit.)
-    limit: Optional[int] = PaginationLimitValidator(max_value=1000), Default(100)
+    limit: int | None = PaginationLimitValidator(max_value=1000), Default(100)
 
     # Alternatively, you can also just override the default and leave the validator unchanged:
-    limit: Optional[int] = Default(100)
+    limit: int | None = Default(100)
 ```
 
 
@@ -252,8 +249,6 @@ using the `limit` parameter ("opt-in pagination").
 **Examples:**
 
 ```python
-from typing import Optional
-
 from validataclass.dataclasses import Default
 from validataclass_search_queries.pagination import CursorPaginationMixin, PaginationLimitValidator
 from validataclass_search_queries.search_queries import search_query_dataclass, BaseSearchQuery
@@ -261,10 +256,10 @@ from validataclass_search_queries.search_queries import search_query_dataclass, 
 @search_query_dataclass
 class ExampleSearchQuery(CursorPaginationMixin, BaseSearchQuery):
     # Opt-out pagination: Allow limit=0 to disable pagination, but by default, paginate with a limit of 20.
-    limit: Optional[int] = PaginationLimitValidator(optional=True), Default(20)
+    limit: int | None = PaginationLimitValidator(optional=True), Default(20)
 
     # Opt-in pagination: Don't paginate by default, but allow limit to be set (e.g. limit=20) to enable pagination.
-    limit: Optional[int] = PaginationLimitValidator(optional=True), Default(None)
+    limit: int | None = PaginationLimitValidator(optional=True), Default(None)
 ```
 
 
@@ -313,8 +308,6 @@ There is nothing new here, just combine the classes from above. For completeness
 offset pagination, so it can be combined with sorting) nevertheless:
 
 ```python
-from typing import Optional
-
 from validataclass.dataclasses import Default
 from validataclass.validators import AnyOfValidator, IntegerValidator, StringValidator
 from validataclass_search_queries.filters import SearchParamContains, SearchParamEquals
@@ -326,14 +319,14 @@ from validataclass_search_queries.sorting import SortingMixin
 @search_query_dataclass
 class ExampleSearchQuery(SortingMixin, OffsetPaginationMixin, BaseSearchQuery):
     # Opt-in pagination
-    limit: Optional[int] = PaginationLimitValidator(optional=True), Default(None)
+    limit: int | None = PaginationLimitValidator(optional=True), Default(None)
 
     # Set allowed sorting keys and default sorting key
     sorted_by: str = AnyOfValidator(['id', 'created_at', 'name', 'total_value']), Default('name')
 
     # Search filters
-    name: Optional[str] = SearchParamContains(), StringValidator()
-    customer_id: Optional[int] = SearchParamEquals(), IntegerValidator(allow_strings=True)
+    name: str | None = SearchParamContains(), StringValidator()
+    customer_id: int | None = SearchParamEquals(), IntegerValidator(allow_strings=True)
     # (Other filters omitted)
 ```
 
@@ -344,8 +337,6 @@ For example, if all your search queries use sorting and offset pagination, you c
 this:
 
 ```python
-from typing import Optional
-
 from validataclass.dataclasses import Default
 from validataclass_search_queries.pagination import OffsetPaginationMixin, PaginationLimitValidator
 from validataclass_search_queries.search_queries import search_query_dataclass, BaseSearchQuery
@@ -355,7 +346,7 @@ from validataclass_search_queries.sorting import SortingMixin
 @search_query_dataclass
 class AppBaseSearchQuery(SortingMixin, OffsetPaginationMixin, BaseSearchQuery):
     # Set default pagination limits
-    limit: Optional[int] = PaginationLimitValidator(max_value=1000), Default(50)
+    limit: int | None = PaginationLimitValidator(max_value=1000), Default(50)
 
 
 # Now define your actual search query dataclasses like this:
@@ -369,7 +360,6 @@ In a similar way, you can define a custom mixin class for filters that you need 
 
 ```python
 from datetime import datetime
-from typing import Optional
 
 from validataclass.validators import DateTimeValidator
 from validataclass_search_queries.filters import SearchParamSince, SearchParamUntil
@@ -379,8 +369,8 @@ from validataclass_search_queries.search_queries import search_query_dataclass, 
 @search_query_dataclass
 class CreatedModifiedMixin(BaseSearchQuery):
     # Define reusable filters
-    created_since: Optional[datetime] = SearchParamSince('created_at'), DateTimeValidator()
-    created_until: Optional[datetime] = SearchParamUntil('created_at'), DateTimeValidator()
+    created_since: datetime | None = SearchParamSince('created_at'), DateTimeValidator()
+    created_until: datetime | None = SearchParamUntil('created_at'), DateTimeValidator()
 ```
 
 

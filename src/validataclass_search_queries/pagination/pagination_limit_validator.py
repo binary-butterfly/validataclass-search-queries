@@ -4,7 +4,7 @@ Copyright (c) 2022, binary butterfly GmbH and contributors
 Use of this source code is governed by an MIT-style license that can be found in the LICENSE file.
 """
 
-from typing import Any, Optional
+from typing import Any
 
 from validataclass.exceptions import ValidationError
 from validataclass.validators import IntegerValidator
@@ -51,7 +51,7 @@ class PaginationLimitValidator(IntegerValidator):
         self,
         *,
         optional: bool = False,
-        max_value: Optional[int] = IntegerValidator.DEFAULT_MAX_VALUE,
+        max_value: int | None = IntegerValidator.DEFAULT_MAX_VALUE,
     ):
         """
         Creates a PaginationLimitValidator.
@@ -70,7 +70,7 @@ class PaginationLimitValidator(IntegerValidator):
         )
         self.optional = optional
 
-    def validate(self, input_data: Any, **kwargs) -> Optional[int]:
+    def validate(self, input_data: Any, **kwargs) -> int | None:
         """
         Validates the input as an integer. Returns the integer or None if the input is 0 or None.
         """

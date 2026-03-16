@@ -4,7 +4,7 @@ Copyright (c) 2022, binary butterfly GmbH and contributors
 Use of this source code is governed by an MIT-style license that can be found in the LICENSE file.
 """
 
-from typing import Any, Optional
+from typing import Any
 
 from sqlalchemy.sql import ColumnElement
 
@@ -69,7 +69,7 @@ class SearchParamTernary(SearchParam):
     value_true: Any
     value_false: Any
 
-    def __init__(self, true: Any, false: Any, *, column_name: Optional[str] = None):
+    def __init__(self, true: Any, false: Any, *, column_name: str | None = None):
         super().__init__(column_name)
         self.value_true = true
         self.value_false = false
