@@ -49,9 +49,9 @@ flake8:
 open-coverage:
 	$(or $(BROWSER),firefox) ./reports/coverage_html/index.html
 
-# Run complete tox test suite in a multi-python Docker container
-.PHONY: docker-tox
-docker-tox:
+# Base target for running tox in a multi-python Docker container (don't use directly)
+.PHONY: _docker-tox
+_docker-tox:
 	docker run --rm --tty \
 		--user $(DOCKER_USER) \
 		--mount "type=bind,src=$(shell pwd),target=/code" \
@@ -60,45 +60,35 @@ docker-tox:
 		$(DOCKER_MULTI_PYTHON_IMAGE) \
 		tox run --workdir .tox_docker $(TOX_ARGS)
 
+# Run complete tox test suite in a multi-python Docker container
+.PHONY: docker-tox
+docker-tox: _docker-tox
+
 # Run partial tox test suites in Docker
 .PHONY: docker-test-py312-sqlalchemy1.4 docker-test-py312-sqlalchemy2.0 \
 		docker-test-py311-sqlalchemy1.4 docker-test-py311-sqlalchemy2.0 \
-		docker-test-py310-sqlalchemy1.4 docker-test-py310-sqlalchemy2.0 \
-		docker-test-py39-sqlalchemy1.4 docker-test-py39-sqlalchemy2.0 \
-		docker-test-py38-sqlalchemy1.4 docker-test-py38-sqlalchemy2.0
-docker-test-py312-sqlalchemy1.4: TOX_ARGS="-e clean,py312,py312-report,sqlalchemy1.4"
-docker-test-py312-sqlalchemy1.4: docker-tox
-docker-test-py312-sqlalchemy2.0: TOX_ARGS="-e clean,py312,py312-report,sqlalchemy2.0"
-docker-test-py312-sqlalchemy2.0: docker-tox
-docker-test-py311-sqlalchemy1.4: TOX_ARGS="-e clean,py311,py311-report,sqlalchemy1.4"
-docker-test-py311-sqlalchemy1.4: docker-tox
-docker-test-py311-sqlalchemy2.0: TOX_ARGS="-e clean,py311,py311-report,sqlalchemy2.0"
-docker-test-py311-sqlalchemy2.0: docker-tox
-docker-test-py310-sqlalchemy1.4: TOX_ARGS="-e clean,py310,py310-report,sqlalchemy1.4"
-docker-test-py310-sqlalchemy1.4: docker-tox
-docker-test-py310-sqlalchemy2.0: TOX_ARGS="-e clean,py310,py310-report,sqlalchemy2.0"
-docker-test-py310-sqlalchemy2.0: docker-tox
-docker-test-py39-sqlalchemy1.4: TOX_ARGS="-e clean,py39,py39-report,sqlalchemy1.4"
-docker-test-py39-sqlalchemy1.4: docker-tox
-docker-test-py39-sqlalchemy2.0: TOX_ARGS="-e clean,py39,py39-report,sqlalchemy2.0"
-docker-test-py39-sqlalchemy2.0: docker-tox
-docker-test-py38-sqlalchemy1.4: TOX_ARGS="-e clean,py38,py38-report,sqlalchemy1.4"
-docker-test-py38-sqlalchemy1.4: docker-tox
-docker-test-py38-sqlalchemy2.0: TOX_ARGS="-e clean,py38,py38-report,sqlalchemy2.0"
-docker-test-py38-sqlalchemy2.0: docker-tox
+		docker-test-py310-sqlalchemy1.4 docker-test-py310-sqlalchemy2.0
+docker-test-py312-sqlalchemy1.4: TOX_ARGS="-e clean,py312-sqlalchemy1.4,py312-report"
+docker-test-py312-sqlalchemy1.4: _docker-tox
+docker-test-py312-sqlalchemy2.0: TOX_ARGS="-e clean,py312-sqlalchemy2.0,py312-report"
+docker-test-py312-sqlalchemy2.0: _docker-tox
+docker-test-py311-sqlalchemy1.4: TOX_ARGS="-e clean,py311-sqlalchemy1.4,py311-report"
+docker-test-py311-sqlalchemy1.4: _docker-tox
+docker-test-py311-sqlalchemy2.0: TOX_ARGS="-e clean,py311-sqlalchemy2.0,py311-report"
+docker-test-py311-sqlalchemy2.0: _docker-tox
+docker-test-py310-sqlalchemy1.4: TOX_ARGS="-e clean,py310-sqlalchemy1.4,py310-report"
+docker-test-py310-sqlalchemy1.4: _docker-tox
+docker-test-py310-sqlalchemy2.0: TOX_ARGS="-e clean,py310-sqlalchemy2.0,py310-report"
+docker-test-py310-sqlalchemy2.0: _docker-tox
 
 # Run all tox test suites, but separately to check code coverage individually
 .PHONY: docker-test-all
 docker-test-all:
-	make docker-test-py38-sqlalchemy1.4
-	make docker-test-py39-sqlalchemy1.4
 	make docker-test-py310-sqlalchemy1.4
-	make docker-test-py311-sqlalchemy1.4
-	make docker-test-py312-sqlalchemy1.4
-	make docker-test-py38-sqlalchemy2.0
-	make docker-test-py39-sqlalchemy2.0
 	make docker-test-py310-sqlalchemy2.0
+	make docker-test-py311-sqlalchemy1.4
 	make docker-test-py311-sqlalchemy2.0
+	make docker-test-py312-sqlalchemy1.4
 	make docker-test-py312-sqlalchemy2.0
 
 # Pull the latest image of the multi-python Docker image
