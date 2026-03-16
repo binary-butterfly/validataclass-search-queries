@@ -1,0 +1,82 @@
+# GitHub Actions workflow for running unit tests (using tox, pytest and flake8) on each push or pull request to main.
+
+name: Unit tests
+
+# TODO: Remove dev-mypy after merging it into main.
+on:
+  push:
+    branches:
+      - main
+      - dev-mypy
+  pull_request:
+    branches:
+      - main
+      - dev-mypy
+
+jobs:
+  test:
+    name: Run unit tests (Python ${{ matrix.python-version }}, SQLAlchemy ${{ matrix.sqlalchemy-version }})
+    runs-on: ubuntu-24.04
+
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version:
+          - '3.8'
+          - '3.9'
+          - '3.10'
+          - '3.11'
+          - '3.12'
+        sqlalchemy-version:
+          - '1.4'
+          - '2.0'
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install dependencies
+        run: pip install --upgrade pip tox
+
+      - name: Run test suite with tox
+        # Run tox using the version of Python in `PATH`
+        run: tox run -e clean,py-sqlalchemy${{ matrix.sqlalchemy-version }},report,flake8 -- --junit-xml=reports/pytest_${{ matrix.python-version }}_sqlalchemy${{ matrix.sqlalchemy-version }}.xml
+
+      - name: Upload test result artifacts
+        uses: actions/upload-artifact@v4
+        if: success() || failure()
+        with:
+          name: pytest-results-${{ matrix.python-version }}-sqlalchemy${{ matrix.sqlalchemy-version }}
+          path: reports/pytest_${{ matrix.python-version }}_sqlalchemy${{ matrix.sqlalchemy-version }}.xml
+
+  report:
+    name: Publish unit test reports
+    runs-on: ubuntu-24.04
+
+    # Job depends on test results
+    needs: test
+
+    # Do not run this job in pull requests from a forked repository (because the test-reporter would fail)
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download test result artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: reports/
+          pattern: pytest-results-*
+          merge-multiple: true
+
+      - name: Publish unit test reports
+        uses: dorny/test-reporter@v2.1.1
+        if: success() || failure()
+        with:
+          name: Pytest Report
+          path: reports/pytest_*.xml
+          reporter: java-junit
