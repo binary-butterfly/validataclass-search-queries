@@ -11,10 +11,10 @@ from sqlalchemy.sql import ColumnElement
 from validataclass.dataclasses import validataclass, Default
 from validataclass.validators import IntegerValidator
 
+from validataclass_search_queries import pagination, sorting
 from .abstract_pagination_mixin import AbstractPaginationMixin
 from .paginated_result import PaginatedResult
 from .pagination_limit_validator import PaginationLimitValidator
-from .. import pagination, sorting
 
 __all__ = [
     'CursorPaginationMixin',

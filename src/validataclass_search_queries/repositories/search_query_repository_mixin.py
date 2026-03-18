@@ -9,10 +9,10 @@ from typing import Generic, TypeVar
 
 from sqlalchemy.orm import Query
 
-from ..filters import BoundSearchFilter
-from ..pagination import AbstractPaginationMixin, PaginatedResult
-from ..search_queries import BaseSearchQuery
-from ..sorting import AbstractSortingMixin
+from validataclass_search_queries.filters import BoundSearchFilter
+from validataclass_search_queries.pagination import AbstractPaginationMixin, PaginatedResult
+from validataclass_search_queries.search_queries import BaseSearchQuery
+from validataclass_search_queries.sorting import AbstractSortingMixin
 
 __all__ = [
     'SearchQueryRepositoryMixin',

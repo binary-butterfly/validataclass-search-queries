@@ -10,10 +10,10 @@ from sqlalchemy.orm import Query
 from validataclass.dataclasses import validataclass, Default
 from validataclass.validators import IntegerValidator
 
+from validataclass_search_queries import pagination
 from .abstract_pagination_mixin import AbstractPaginationMixin
 from .paginated_result import PaginatedResult
 from .pagination_limit_validator import PaginationLimitValidator
-from .. import pagination
 
 __all__ = [
     'OffsetPaginationMixin',
