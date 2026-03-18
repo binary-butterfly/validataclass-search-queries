@@ -109,12 +109,11 @@ def _prepare_search_query_dataclass(cls) -> None:
         if field_args.get('default', None) is None:
             field_args['default'] = Default(None)
 
-        # Create validataclass field (undocumented parameter _name is needed for required fields in Python < 3.10)
+        # Create validataclass field
         setattr(cls, name, validataclass_field(
             validator=field_args.get('validator'),
             default=field_args.get('default'),
             metadata={'search_param': field_args.get('search_param')},
-            _name=name,
         ))
 
 
