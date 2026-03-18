@@ -14,7 +14,7 @@ from validataclass.dataclasses import validataclass, validataclass_field, BaseDe
 from validataclass.exceptions import DataclassValidatorFieldException
 from validataclass.validators import Validator
 
-from ..filters import SearchParam
+from validataclass_search_queries.filters import SearchParam
 
 __all__ = [
     'search_query_dataclass',

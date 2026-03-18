@@ -6,9 +6,9 @@ Use of this source code is governed by an MIT-style license that can be found in
 
 from typing import Any
 
+from validataclass_search_queries.search_queries import BaseSearchQuery
 from .abstract_pagination_mixin import AbstractPaginationMixin
 from .paginated_result import PaginatedResult
-from ..search_queries import BaseSearchQuery
 
 __all__ = [
     'paginated_api_response',

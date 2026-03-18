@@ -11,7 +11,7 @@ from typing import Any
 
 from validataclass.helpers import UnsetValue
 
-from ..filters import BoundSearchFilter
+from validataclass_search_queries.filters import BoundSearchFilter
 
 __all__ = [
     'BaseSearchQuery',
