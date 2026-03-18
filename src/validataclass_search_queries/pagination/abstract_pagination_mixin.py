@@ -5,7 +5,7 @@ Use of this source code is governed by an MIT-style license that can be found in
 """
 
 from abc import ABC, abstractmethod
-from typing import Any, Optional
+from typing import Any
 
 from sqlalchemy.orm import Query
 
@@ -22,7 +22,7 @@ class AbstractPaginationMixin(ABC):
     """
 
     # The pagination limit (i.e. maximum number of items per page), or None if pagination is disabled
-    limit: Optional[int]
+    limit: int | None
 
     @abstractmethod
     def apply_pagination_to_query(self, query: Query, model_cls: Any) -> Query:
@@ -45,7 +45,7 @@ class AbstractPaginationMixin(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def get_next_start_value(self, paginated_result: PaginatedResult) -> Optional[int]:
+    def get_next_start_value(self, paginated_result: PaginatedResult) -> int | None:
         """
         Returns the next value for the pagination start parameter (see also: `get_start_parameter_name()`) to retrieve
         the next page of data, or None if there is no next page.

@@ -4,11 +4,19 @@ Copyright (c) 2022, binary butterfly GmbH and contributors
 Use of this source code is governed by an MIT-style license that can be found in the LICENSE file.
 """
 
+from collections.abc import Iterable
 from enum import Enum
-from typing import Any, Optional, List, Type, Iterable
+from typing import Any
 
-from validataclass.validators import Validator, ListValidator, IntegerValidator, AnyOfValidator, EnumValidator, \
-    T_ListItem, T_Enum
+from validataclass.validators import (
+    AnyOfValidator,
+    EnumValidator,
+    IntegerValidator,
+    ListValidator,
+    Validator,
+    T_ListItem,
+    T_Enum,
+)
 
 __all__ = [
     'MultiSelectValidator',
@@ -49,7 +57,7 @@ class MultiSelectValidator(ListValidator[T_ListItem]):
         item_validator: Validator,
         *,
         delimiter: str = ',',
-        max_length: Optional[int] = None,
+        max_length: int | None = None,
     ):
         """
         Create a MultiSelectValidator with a given item validator.
@@ -67,7 +75,7 @@ class MultiSelectValidator(ListValidator[T_ListItem]):
         )
         self.delimiter = delimiter
 
-    def validate(self, input_data: Any, **kwargs) -> List[T_ListItem]:
+    def validate(self, input_data: Any, **kwargs) -> list[T_ListItem]:
         """
         Validate input data as string. Returns a validated list.
         """
@@ -94,11 +102,11 @@ class MultiSelectIntegerValidator(MultiSelectValidator[int]):
         self,
         *,
         # Integer validator settings
-        min_value: Optional[int] = IntegerValidator.DEFAULT_MIN_VALUE,
-        max_value: Optional[int] = IntegerValidator.DEFAULT_MAX_VALUE,
+        min_value: int | None = IntegerValidator.DEFAULT_MIN_VALUE,
+        max_value: int | None = IntegerValidator.DEFAULT_MAX_VALUE,
         # List settings
         delimiter: str = ',',
-        max_length: Optional[int] = None,
+        max_length: int | None = None,
     ):
         """
         Create a MultiSelectValidator using a IntegerValidator to validate the items.
@@ -127,12 +135,12 @@ class MultiSelectAnyOfValidator(MultiSelectValidator):
         # AnyOfValidator settings
         allowed_values: Iterable[Any],
         # TODO: case_insensitive is deprecated in validataclass and must be removed in a future version.
-        case_sensitive: Optional[bool] = None,
-        case_insensitive: Optional[bool] = None,
+        case_sensitive: bool | None = None,
+        case_insensitive: bool | None = None,
         *,
         # List settings
         delimiter: str = ',',
-        max_length: Optional[int] = None,
+        max_length: int | None = None,
     ):
         """
         Create a MultiSelectValidator using a AnyOfValidator to validate the items.
@@ -154,15 +162,15 @@ class MultiSelectEnumValidator(MultiSelectValidator[T_Enum]):
     def __init__(
         self,
         # EnumValidator settings
-        enum_cls: Type[Enum],
+        enum_cls: type[Enum],
         *,
-        allowed_values: Optional[Iterable[Any]] = None,
+        allowed_values: Iterable[Any] | None = None,
         # TODO: case_insensitive is deprecated in validataclass and must be removed in a future version.
-        case_sensitive: Optional[bool] = None,
-        case_insensitive: Optional[bool] = None,
+        case_sensitive: bool | None = None,
+        case_insensitive: bool | None = None,
         # List settings
         delimiter: str = ',',
-        max_length: Optional[int] = None,
+        max_length: int | None = None,
     ):
         """
         Create a MultiSelectValidator using a EnumValidator to validate the items.

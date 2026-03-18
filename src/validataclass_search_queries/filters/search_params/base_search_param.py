@@ -5,7 +5,7 @@ Use of this source code is governed by an MIT-style license that can be found in
 """
 
 from abc import ABC, abstractmethod
-from typing import Any, Optional
+from typing import Any
 
 from sqlalchemy.sql import ColumnElement
 
@@ -38,18 +38,18 @@ class SearchParam(ABC):
     @search_query_dataclass
     class MySearchQuery(BaseSearchQuery):
         # Search for a concrete name (parameter name equals column name, so it doesn't need to be specified)
-        name: Optional[str] = SearchParamEquals(), StringValidator()
+        name: str | None = SearchParamEquals(), StringValidator()
 
         # Filter objects by modification date (based on the 'modified' column)
-        modified_since: Optional[datetime] = SearchParamSince('modified'), DateTimeValidator()
-        modified_until: Optional[datetime] = SearchParamUntil('modified'), DateTimeValidator()
+        modified_since: datetime | None = SearchParamSince('modified'), DateTimeValidator()
+        modified_until: datetime | None = SearchParamUntil('modified'), DateTimeValidator()
     ```
     """
 
     # Optional: Name of the column (if not specified, the parameter name will be used)
-    column_name: Optional[str]
+    column_name: str | None
 
-    def __init__(self, column_name: Optional[str] = None):
+    def __init__(self, column_name: str | None = None):
         self.column_name = column_name
 
     @staticmethod  # pragma: nocover

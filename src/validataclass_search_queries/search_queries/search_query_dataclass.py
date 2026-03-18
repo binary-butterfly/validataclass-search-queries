@@ -5,7 +5,8 @@ Use of this source code is governed by an MIT-style license that can be found in
 """
 
 import dataclasses
-from typing import Any, Callable, Dict, Optional, Type, TypeVar, Union, overload
+from collections.abc import Callable
+from typing import Any, TypeVar, overload
 
 from typing_extensions import dataclass_transform
 from validataclass.dataclasses import validataclass, validataclass_field, Default
@@ -24,12 +25,12 @@ _T = TypeVar('_T')
 #  decorator when custom field options are implemented in validataclass.
 
 @overload
-def search_query_dataclass(cls: Type[_T]) -> Type[_T]:
+def search_query_dataclass(cls: type[_T]) -> type[_T]:
     ...
 
 
 @overload
-def search_query_dataclass(cls: None = None, **kwargs) -> Callable[[Type[_T]], Type[_T]]:
+def search_query_dataclass(cls: None = None, /, **kwargs) -> Callable[[type[_T]], type[_T]]:
     ...
 
 
@@ -37,7 +38,11 @@ def search_query_dataclass(cls: None = None, **kwargs) -> Callable[[Type[_T]], T
     kw_only_default=True,
     field_specifiers=(dataclasses.field, dataclasses.Field, validataclass_field),
 )
-def search_query_dataclass(cls: Optional[Type[_T]] = None, **kwargs) -> Union[Type[_T], Callable[[Type[_T]], Type[_T]]]:
+def search_query_dataclass(
+    cls: type[_T] | None = None,
+    /,
+    **kwargs: Any,
+) -> type[_T] | Callable[[type[_T]], type[_T]]:
     """
     Custom dataclass decorator based on @validataclass, adding support for search parameter fields.
 
@@ -52,10 +57,10 @@ def search_query_dataclass(cls: Optional[Type[_T]] = None, **kwargs) -> Union[Ty
 
     For search parameter fields, an implicit `Default(None)` is assumed. You can overwrite this by setting a Default
     object yourself, but in most cases you'll want `Default(None)`, so that's the default. Keep in mind that you need
-    to set the type hints correctly, though (always use `Optional[]` unless you specified a different default).
+    to set the type hints correctly, though (always use `T | None` unless you specified a different default).
     """
 
-    def decorator(_cls: Type[_T]) -> Type[_T]:
+    def decorator(_cls: type[_T]) -> type[_T]:
         _prepare_search_query_dataclass(_cls)
         return validataclass(_cls, **kwargs)
 
@@ -108,7 +113,7 @@ def _prepare_search_query_dataclass(cls) -> None:
         ))
 
 
-def _get_existing_validator_fields(cls) -> Dict[str, Dict[str, Any]]:
+def _get_existing_validator_fields(cls) -> dict[str, dict[str, Any]]:
     """
     Internal helper function used by @search_query_dataclass to get all pre-existing validataclass fields from the base classes.
     """

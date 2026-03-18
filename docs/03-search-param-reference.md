@@ -27,7 +27,7 @@ The `SearchParamEquals` filter is a simple "is equal to" filter for matching exa
 ```
 # This results in the filter `Model.column == param`
 # (In SQL this would render as `column = {param}` or `column IS {param}` depending on the type)
-param: Optional[Any] = SearchParamEquals('column'), any_validator
+param: Any = SearchParamEquals('column'), any_validator
 ```
 
 
@@ -53,13 +53,13 @@ All of these filters work with an SQL `LIKE` expression. The values are automati
 # (Assuming that the parameters are set to the string "example")
 
 # Results in: `name LIKE "%example%"`
-name_contains: Optional[str] = SearchParamContains('name'), StringValidator()
+name_contains: str | None = SearchParamContains('name'), StringValidator()
 
 # Results in: `name LIKE "%example"`
-name_prefix: Optional[str] = SearchParamStartsWith('name'), StringValidator()
+name_prefix: str | None = SearchParamStartsWith('name'), StringValidator()
 
 # Results in: `name LIKE "example%"`
-name_suffix: Optional[str] = SearchParamEndsWith('name'), StringValidator()
+name_suffix: str | None = SearchParamEndsWith('name'), StringValidator()
 ```
 
 
@@ -84,7 +84,7 @@ boolean values (or rather, that interprets all values as booleans).
 
 ```
 # Results in: `completed IS TRUE` or `completed IS FALSE`, depending on the value
-completed: Optional[bool] = SearchParamBoolean(), BooleanValidator(allow_strings=True)
+completed: bool | None = SearchParamBoolean(), BooleanValidator(allow_strings=True)
 ```
 
 
@@ -107,10 +107,10 @@ For `SearchParamIsNotNone`:
 
 ```
 # Results in: `price IS NULL` (if free=true) or `price IS NOT NULL` (if free=false)
-free: Optional[bool] = SearchParamIsNone('price'), BooleanValidator(allow_strings=True)
+free: bool | None = SearchParamIsNone('price'), BooleanValidator(allow_strings=True)
 
 # Results in: `completed_at IS NOT NULL` (if completed=true) or `completed_at IS NULL` (if completed=false)
-completed: Optional[bool] = SearchParamIsNotNone('completed_at'), BooleanValidator(allow_strings=True)
+completed: bool | None = SearchParamIsNotNone('completed_at'), BooleanValidator(allow_strings=True)
 ```
 
 
@@ -138,7 +138,7 @@ Instead of a string equals filter, we want a boolean parameter `is_public` thoug
 ```
 # Results in: `visibility = "public"` (if true) or `visibility = "hidden"` (if false)
 # (Note that the column name needs to be specified as a keyword argument in this case.)
-is_public: Optional[bool] = SearchParamTernary('public', 'hidden', column_name='visibility'), \
+is_public: bool | None = SearchParamTernary('public', 'hidden', column_name='visibility'), \
     BooleanValidator(allow_strings=True)
 ```
 
@@ -165,22 +165,22 @@ aliases for the filters above:
 
 ```
 # Results in: `price > {price_above}`
-price_above: Optional[Decimal] = SearchParamGreaterThan('price'), DecimalValidator()
+price_above: Decimal | None = SearchParamGreaterThan('price'), DecimalValidator()
 
 # Results in: `price < {price_below}`
-price_below: Optional[Decimal] = SearchParamLessThan('price'), DecimalValidator()
+price_below: Decimal | None = SearchParamLessThan('price'), DecimalValidator()
 
 # Results in: `price >= {price_from}`
-price_from: Optional[Decimal] = SearchParamGreaterOrEqual('price'), DecimalValidator()
+price_from: Decimal | None = SearchParamGreaterOrEqual('price'), DecimalValidator()
 
 # Results in: `price <= {price_to}`
-price_to: Optional[Decimal] = SearchParamLessOrEqual('price'), DecimalValidator()
+price_to: Decimal | None = SearchParamLessOrEqual('price'), DecimalValidator()
 
 # Results in: `modified >= {modified_since}` (same as SearchParamGreaterOrEqual)
-modified_since: Optional[datetime] = SearchParamSince('modified'), DateTimeValidator()
+modified_since: datetime | None = SearchParamSince('modified'), DateTimeValidator()
 
 # Results in: `modified <= {modified_until}` (same as SearchParamLessOrEqual)
-modified_until: Optional[datetime] = SearchParamUntil('modified'), DateTimeValidator()
+modified_until: datetime | None = SearchParamUntil('modified'), DateTimeValidator()
 ```
 
 
@@ -244,11 +244,11 @@ Here are some examples for how to define multi-select filters using the aforemen
 ```
 # Accepts a comma-separated list of positive integers like "2,4,6"
 # Results in a filter like `customer_id IN (2, 4, 6)`
-customer_id: Optional[List[int]] = SearchParamMultiSelect(), MultiSelectIntegerValidator(min_value=1)
+customer_id: list[int] | None = SearchParamMultiSelect(), MultiSelectIntegerValidator(min_value=1)
 
 # Accepts a comma-separated list of strings (but only those defined in the validator), e.g. "active,pending"
 # Results in a filter like `status IN ("active", "pending")`
-status: Optional[List[str]] = SearchParamMultiSelect(), MultiSelectAnyOfValidator(['active', 'inactive', 'pending'])
+status: list[str] | None = SearchParamMultiSelect(), MultiSelectAnyOfValidator(['active', 'inactive', 'pending'])
 ```
 
 
@@ -276,5 +276,5 @@ used without your custom implementation in the repository.
 
 ```
 # This search parameter only works if the repository handles it manually
-param: Optional[Any] = SearchParamCustom(), any_validator
+param: Any = SearchParamCustom(), any_validator
 ```
