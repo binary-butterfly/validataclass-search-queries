@@ -16,7 +16,6 @@ from validataclass_search_queries.sorting import AbstractSortingMixin
 
 __all__ = [
     'SearchQueryRepositoryMixin',
-    'T_Model',
 ]
 
 T_Model = TypeVar('T_Model')
