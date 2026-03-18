@@ -9,8 +9,6 @@ from typing import TypeVar
 
 __all__ = [
     'PaginatedResult',
-    'T_Result',
-    'T_MappedResult',
 ]
 
 T_Result = TypeVar('T_Result')
