@@ -343,26 +343,39 @@ def test_search_query_dataclass_with_invalid_values():
         ((SearchParamEquals(), Default(0)), 'Dataclass field "foo" must specify a Validator.'),
 
         # Too many validators
-        ((IntegerValidator(), StringValidator()), 'Only one Validator can be specified.'),
-        ((SearchParamEquals(), IntegerValidator(), IntegerValidator()), 'Only one Validator can be specified.'),
+        (
+            (IntegerValidator(), StringValidator()),
+            'Dataclass field "foo": Only one Validator can be specified.',
+        ),
+        (
+            (SearchParamEquals(), IntegerValidator(), IntegerValidator()),
+            'Dataclass field "foo": Only one Validator can be specified.',
+        ),
 
         # Too many defaults
-        ((Default(1), IntegerValidator(), Default(2)), 'Only one Default can be specified.'),
-        ((Default(1), SearchParamEquals(), IntegerValidator(), Default(2)), 'Only one Default can be specified.'),
+        (
+            (Default(1), IntegerValidator(), Default(2)),
+            'Dataclass field "foo": Only one Default can be specified.',
+        ),
+        (
+            (Default(1), SearchParamEquals(), IntegerValidator(), Default(2)),
+            'Dataclass field "foo": Only one Default can be specified.',
+        ),
 
         # Too many SearchParams
-        ((SearchParamEquals(), IntegerValidator(), SearchParamLessThan()), 'Only one SearchParam can be specified.'),
+        (
+            (SearchParamEquals(), IntegerValidator(), SearchParamLessThan()),
+            'Dataclass field "foo": Only one SearchParam can be specified.',
+        ),
 
         # Unexpected type in tuple
-        ((IntegerValidator(), 42), 'Unexpected type of argument: int'),
-        ((SearchParamEquals(), IntegerValidator(), 42), 'Unexpected type of argument: int'),
+        ((IntegerValidator(), 42), 'Dataclass field "foo": Unexpected type of argument: int'),
+        ((SearchParamEquals(), IntegerValidator(), 42), 'Dataclass field "foo": Unexpected type of argument: int'),
     ],
 )
 def test_search_query_dataclass_with_invalid_field_tuples(field_tuple, expected_exception_msg):
     """ Test that @search_query_dataclass raises exceptions for various invalid tuples. """
-    # TODO: This should use DataclassValidatorFieldException to be consistent with validataclass.
-    # with pytest.raises(DataclassValidatorFieldException) as exception_info:
-    with pytest.raises(Exception) as exception_info:
+    with pytest.raises(DataclassValidatorFieldException) as exception_info:
         @search_query_dataclass
         class InvalidSearchQueryDataclass:
             foo: int = field_tuple
