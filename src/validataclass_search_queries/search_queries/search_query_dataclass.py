@@ -98,6 +98,8 @@ def _prepare_search_query_dataclass(cls) -> None:
 
         # Ensure that a validator is set
         if not isinstance(field_args.get('validator', None), Validator):
+            # TODO: Update exception messages to be consistent with validataclass 0.12.0
+            # TODO: Use DataclassValidatorFieldException instead of ValueError to be consistent with validataclass.
             raise ValueError(f'Dataclass field "{name}" must specify a Validator.')
 
         # For SearchParam fields, use Default(None) if no explicit default was set
@@ -147,6 +149,8 @@ def _parse_validator_tuple(args: Any) -> dict:
     # Find validator, default object and search param in tuple and return them as a dictionary
     arg_dict = {}
 
+    # TODO: Update exception messages to be consistent with validataclass 0.12.0
+    # TODO: Use DataclassValidatorFieldException instead of ValueError/TypeError to be consistent with validataclass.
     for arg in args:
         if isinstance(arg, Validator):
             if 'validator' in arg_dict:
