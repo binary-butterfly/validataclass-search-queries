@@ -4,7 +4,7 @@ Copyright (c) 2022, binary butterfly GmbH and contributors
 Use of this source code is governed by an MIT-style license that can be found in the LICENSE file.
 """
 
-from typing import Any
+from typing import Any, TypeVar
 
 from sqlalchemy.orm import Query
 from validataclass.dataclasses import validataclass, Default
@@ -18,6 +18,8 @@ from .pagination_limit_validator import PaginationLimitValidator
 __all__ = [
     'OffsetPaginationMixin',
 ]
+
+T = TypeVar('T')
 
 
 @validataclass
@@ -87,14 +89,14 @@ class OffsetPaginationMixin(AbstractPaginationMixin):
     # Limit: Number of entries per page
     limit: int | None = PaginationLimitValidator(max_value=100), Default(20)
 
-    def __init_subclass__(cls, **kwargs):
+    def __init_subclass__(cls, **kwargs: Any):
         # Pagination mixins are not compatible with each other, only one can be used at the same time
         if issubclass(cls, pagination.CursorPaginationMixin):
             raise TypeError(f'Invalid base classes in {cls}: Combining multiple pagination mixins is not allowed')
 
         super().__init_subclass__(**kwargs)
 
-    def apply_pagination_to_query(self, query: Query, model_cls: Any) -> Query:
+    def apply_pagination_to_query(self, query: Query[T], model_cls: Any) -> Query[T]:
         """
         Applies the pagination parameters to an SQLAlchemy query and returns the new query.
 
@@ -112,7 +114,7 @@ class OffsetPaginationMixin(AbstractPaginationMixin):
         """
         return 'offset'
 
-    def get_next_start_value(self, paginated_result: PaginatedResult) -> int | None:
+    def get_next_start_value(self, paginated_result: PaginatedResult[Any]) -> int | None:
         """
         Returns the next value for the pagination start parameter to retrieve the next page of data, or None if there
         is no next page.

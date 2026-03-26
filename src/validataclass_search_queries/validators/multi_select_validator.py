@@ -66,7 +66,7 @@ class MultiSelectValidator(ListValidator[T_ListItem]):
         self.delimiter = delimiter
 
     @override
-    def validate(self, input_data: Any, **kwargs) -> list[T_ListItem]:
+    def validate(self, input_data: Any, **kwargs: Any) -> list[T_ListItem]:
         """
         Validate input data as string. Returns a validated list.
         """

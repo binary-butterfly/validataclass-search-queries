@@ -21,8 +21,8 @@ def paginated_api_response(
     *,
     recursive_to_dict: bool = True,
     request_path: str | None = None,
-    original_params: dict | None = None,
-) -> dict:
+    original_params: dict[str, Any] | None = None,
+) -> dict[str, Any]:
     """
     Constructs a REST API response (as a dictionary) for paginated results.
 

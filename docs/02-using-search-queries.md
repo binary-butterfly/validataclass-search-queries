@@ -197,12 +197,15 @@ handle your special filter, and then continue using the methods like you would n
 Here is an example how you could implement this:
 
 ```python
+from typing import TypeVar, override
 from sqlalchemy.orm import Session, Query
 from validataclass.validators import StringValidator
 from validataclass_search_queries.filters import SearchParamContains, BoundSearchFilter
 from validataclass_search_queries.pagination import PaginatedResult
 from validataclass_search_queries.repositories import SearchQueryRepositoryMixin
 from validataclass_search_queries.search_queries import search_query_dataclass, BaseSearchQuery
+
+T_Query = TypeVar('T_Query')
 
 # Stubs for SQLAlchemy models (Customer needs a 1:n relationship "addresses" to Address)
 class Customer: ...
@@ -231,7 +234,8 @@ class CustomerRepository(SearchQueryRepositoryMixin[Customer]):
         query = self.session.query(Customer).join(Customer.addresses)
         return self._search_and_paginate(query, search_query)
 
-    def _apply_bound_search_filter(self, query: Query, bound_filter: BoundSearchFilter) -> Query:
+    @override
+    def _apply_bound_search_filter(self, query: Query[T_Query], bound_filter: BoundSearchFilter) -> Query[T_Query]:
         # Implement special handling for the "city" filter
         if bound_filter.column_name == 'city':
             return query.filter(bound_filter.get_sqlalchemy_filter(Address.city))

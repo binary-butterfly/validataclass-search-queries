@@ -5,7 +5,7 @@ Use of this source code is governed by an MIT-style license that can be found in
 """
 
 from collections.abc import Callable, Iterable
-from typing import TypeVar
+from typing import Any, TypeVar
 
 __all__ = [
     'PaginatedResult',
@@ -71,7 +71,7 @@ class PaginatedResult(list[T_Result]):
             total_count=self.total_count,
         )
 
-    def to_dict(self, *, recursive: bool = False) -> dict:
+    def to_dict(self, *, recursive: bool = False) -> dict[str, Any]:
         """
         Returns a dictionary representing the PaginatedResult, consisting of the keys "items" (a list of the items) and
         "total_count" (the total count as an integer).

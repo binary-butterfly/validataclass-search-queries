@@ -81,7 +81,7 @@ def search_query_dataclass(
     return decorator if cls is None else decorator(cls)
 
 
-def _prepare_search_query_dataclass(cls) -> None:
+def _prepare_search_query_dataclass(cls: type) -> None:
     """
     Internal helper function used by @search_query_dataclass to prepare validataclass fields in a soon-to-be dataclass.
     """
@@ -135,7 +135,7 @@ def _prepare_search_query_dataclass(cls) -> None:
         ))
 
 
-def _get_existing_validator_fields(cls) -> dict[str, _ValidatorField]:
+def _get_existing_validator_fields(cls: type) -> dict[str, _ValidatorField]:
     """
     Returns a dictionary containing all fields (as `_ValidatorField` objects) of an existing validataclass that have a
     validator set in their metadata, or an empty dictionary if the class is not a dataclass (yet).

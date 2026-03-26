@@ -18,15 +18,15 @@ from validataclass_search_queries.sorting import SortingMixin, SortingDirection
 class MockModelCls:
     """ This class is used as a mock for a database model class. """
     id: ColumnClause[int] = sqlalchemy.column('id')
-    unit_test_field: ColumnClause[str] = sqlalchemy.column('unit_test_field')
+    test_field: ColumnClause[str] = sqlalchemy.column('test_field')
 
 
 def test_sorting_mixin_get_sorting_column():
     """ Test SortingMixin.get_sorting_column() on its own. """
     # It's supposed to be used as a mixin, but it should function on its own, too.
     # (Also, we bypass the validators here by creating the object directly, so we can test with any sorted_by key.)
-    sorting_mixin = SortingMixin(sorted_by='unit_test_field', sorting_direction=SortingDirection.DESC)
-    assert sorting_mixin.get_sorting_column(MockModelCls) is MockModelCls.unit_test_field
+    sorting_mixin = SortingMixin(sorted_by='test_field', sorting_direction=SortingDirection.DESC)
+    assert sorting_mixin.get_sorting_column(MockModelCls) is MockModelCls.test_field
 
 
 @pytest.mark.parametrize(
@@ -38,11 +38,11 @@ def test_sorting_mixin_get_sorting_column():
 )
 def test_sorting_mixin_apply_sorting_direction(sorting_direction, expected_dir_str):
     """ Test SortingMixin.apply_sorting_direction() on its own. """
-    sorting_mixin = SortingMixin(sorted_by='unit_test_field', sorting_direction=sorting_direction)
-    order_column = sorting_mixin.apply_sorting_direction(sqlalchemy.column('custom_column'))
+    sorting_mixin = SortingMixin(sorted_by='test_field', sorting_direction=sorting_direction)
+    order_column = sorting_mixin.apply_sorting_direction(MockModelCls.test_field)
 
     assert isinstance(order_column, ColumnElement)
-    assert str(order_column) == f'custom_column {expected_dir_str}'
+    assert str(order_column) == f'test_field {expected_dir_str}'
 
 
 # TODO: Tests for SortingMixin.apply_sorting_to_query()
@@ -109,23 +109,23 @@ def test_sorting_mixin_with_validation_invalid():
     'query_input, expected_column, expected_order_column_str',
     [
         # Defaults
-        ({}, MockModelCls.unit_test_field, 'unit_test_field DESC'),
+        ({}, MockModelCls.test_field, 'test_field DESC'),
         ({'sorted_by': 'id'}, MockModelCls.id, 'id DESC'),
-        ({'sorting_direction': 'ASC'}, MockModelCls.unit_test_field, 'unit_test_field ASC'),
+        ({'sorting_direction': 'ASC'}, MockModelCls.test_field, 'test_field ASC'),
 
         # Explicit values
         ({'sorted_by': 'id', 'sorting_direction': 'ASC'}, MockModelCls.id, 'id ASC'),
         ({'sorted_by': 'id', 'sorting_direction': 'DESC'}, MockModelCls.id, 'id DESC'),
-        ({'sorted_by': 'unit_test_field', 'sorting_direction': 'ASC'}, MockModelCls.unit_test_field, 'unit_test_field ASC'),
-        ({'sorted_by': 'unit_test_field', 'sorting_direction': 'DESC'}, MockModelCls.unit_test_field, 'unit_test_field DESC'),
-    ]
+        ({'sorted_by': 'test_field', 'sorting_direction': 'ASC'}, MockModelCls.test_field, 'test_field ASC'),
+        ({'sorted_by': 'test_field', 'sorting_direction': 'DESC'}, MockModelCls.test_field, 'test_field DESC'),
+    ],
 )
 def test_dataclass_with_sorting_mixin_with_validation(query_input, expected_column, expected_order_column_str):
     """ Test a dataclass that uses and customizes the SortingMixin with validation. """
 
     @validataclass
     class UnitTestSortingQuery(SortingMixin):
-        sorted_by: str = AnyOfValidator(['id', 'unit_test_field']), Default('unit_test_field')
+        sorted_by: str = AnyOfValidator(['id', 'test_field']), Default('test_field')
         sorting_direction: SortingDirection = Default(SortingDirection.DESC)
 
     query_validator = DataclassValidator(UnitTestSortingQuery)
