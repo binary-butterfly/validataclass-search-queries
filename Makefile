@@ -44,6 +44,11 @@ test:
 flake8:
 	tox run -e flake8
 
+# Only run mypy (via tox; you can also just run "mypy" directly)
+.PHONY: mypy
+mypy:
+	tox run -e mypy
+
 # Open HTML coverage report in browser
 .PHONY: open-coverage
 open-coverage:
