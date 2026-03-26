@@ -329,7 +329,7 @@ def test_search_query_dataclass_with_invalid_values():
     with pytest.raises(DataclassValidatorFieldException) as exception_info:
         @search_query_dataclass
         class InvalidSearchQueryDataclass:
-            foo: int
+            foo: int  # type: ignore[validataclass]
 
     assert str(exception_info.value) == 'Dataclass field "foo" must specify a validator.'
 
@@ -378,6 +378,6 @@ def test_search_query_dataclass_with_invalid_field_tuples(field_tuple, expected_
     with pytest.raises(DataclassValidatorFieldException) as exception_info:
         @search_query_dataclass
         class InvalidSearchQueryDataclass:
-            foo: int = field_tuple
+            foo: int = field_tuple  # type: ignore[validataclass]
 
     assert str(exception_info.value) == expected_exception_msg

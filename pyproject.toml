@@ -15,6 +15,11 @@ files = ["src/", "tests/"]
 mypy_path = "src/"
 explicit_package_bases = true
 
+# Enable validataclass mypy plugin
+plugins = [
+    "validataclass.mypy.plugin",
+]
+
 # Enable strict type checking
 # TODO: Enable strict mode!
 #strict = true
@@ -40,11 +45,23 @@ check_untyped_defs = true
 #    "unused-awaitable",
 #]
 
-# TODO: Remove this after enabling the validataclass mypy plugin.
-disable_error_code = "assignment"
-
 [[tool.mypy.overrides]]
 module = 'tests.*'
 
 # Don't enforce typed definitions in tests, this is a lot of unnecessary work (most parameters would be Any anyway).
 allow_untyped_defs = true
+
+[tool.validataclass_mypy]
+# Allow incompatible overrides for fields in validataclass sub classes (this is the default, but the default might be
+# changed in the future).
+allow_incompatible_field_overrides = true
+
+# Declare @search_query_dataclass as a decorator that creates validataclasses
+custom_validataclass_decorators = [
+    "validataclass_search_queries.search_queries.search_query_dataclass.search_query_dataclass",
+]
+
+# Ignore SearchParam objects in validataclass field definitions
+ignore_custom_types_in_fields = [
+    "validataclass_search_queries.filters.search_params.base_search_param.SearchParam",
+]
