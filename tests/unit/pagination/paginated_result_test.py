@@ -7,6 +7,7 @@ Use of this source code is governed by an MIT-style license that can be found in
 from typing import Any
 
 import pytest
+from typing_extensions import override
 
 from validataclass_search_queries.pagination import PaginatedResult
 
@@ -17,6 +18,7 @@ class MockItem:
     def __init__(self, name: str):
         self.name = name
 
+    @override
     def __eq__(self, other):
         return type(self) is type(other) and self.name == other.name
 
