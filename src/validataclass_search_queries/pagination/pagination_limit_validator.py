@@ -64,8 +64,8 @@ class PaginationLimitValidator(Validator[int | None]):
         meaning that pagination is disabled (i.e. unlimited results).
 
         Parameters:
-            optional: Boolean, whether pagination is optional, i.e. the user can set limit=0 to disable pagination (default: False)
-            max_value: Integer or None, maximum value for pagination limit (default: IntegerValidator.DEFAULT_MAX_VALUE = 2147483647)
+            `optional`: bool, whether pagination can be disabled by setting limit to 0 (default: False)
+            `max_value`: int or None, maximum value for pagination limit (default: `IntegerValidator.DEFAULT_MAX_VALUE`)
         """
         # Initialize base integer validator
         self.integer_validator = IntegerValidator(

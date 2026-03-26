@@ -58,7 +58,7 @@ class PaginatedResult(list[T_Result]):
         # This results in a PaginatedResult[dict] containing dictionaries as defined in map_customers above:
         mapped_customers = paginated_result.map(map_customers)
 
-        # Assuming that the Customer class has a similar method `to_dict()` that takes no arguments, we can also do this:
+        # If the Customer class has a similar method `to_dict()` that takes no arguments, we can also do this:
         mapped_customers = paginated_result.map(Customers.to_dict)
         ```
         """
