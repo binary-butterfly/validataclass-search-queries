@@ -12,7 +12,7 @@ from validataclass.exceptions import DictFieldsValidationError
 from validataclass.helpers import UnsetValue, UnsetValueType
 from validataclass.validators import DataclassValidator, EnumValidator, IntegerValidator, StringValidator
 
-from helpers import UnitTestEnum
+from tests.helpers import UnitTestEnum
 from validataclass_search_queries.filters import BoundSearchFilter, SearchParamEquals, SearchParamGreaterThan
 from validataclass_search_queries.search_queries import BaseSearchQuery, search_query_dataclass
 
