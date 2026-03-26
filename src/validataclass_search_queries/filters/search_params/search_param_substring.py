@@ -28,8 +28,7 @@ class SearchParamContains(SearchParam):
 
     @override
     def sqlalchemy_filter(self, column: ColumnElement[Any], value: Any) -> ColumnElement[bool]:
-        # Short-circuit if value is empty
-        return column.contains(value, autoescape=True) if value else column
+        return column.contains(value, autoescape=True)
 
 
 class SearchParamStartsWith(SearchParam):
@@ -42,8 +41,7 @@ class SearchParamStartsWith(SearchParam):
 
     @override
     def sqlalchemy_filter(self, column: ColumnElement[Any], value: Any) -> ColumnElement[bool]:
-        # Short-circuit if value is empty
-        return column.startswith(value, autoescape=True) if value else column
+        return column.startswith(value, autoescape=True)
 
 
 class SearchParamEndsWith(SearchParam):
@@ -56,5 +54,4 @@ class SearchParamEndsWith(SearchParam):
 
     @override
     def sqlalchemy_filter(self, column: ColumnElement[Any], value: Any) -> ColumnElement[bool]:
-        # Short-circuit if value is empty
-        return column.endswith(value, autoescape=True) if value else column
+        return column.endswith(value, autoescape=True)
