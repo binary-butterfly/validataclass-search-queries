@@ -5,9 +5,9 @@ Use of this source code is governed by an MIT-style license that can be found in
 """
 
 from typing import Any
-from typing_extensions import override
 
 from sqlalchemy.sql import ColumnElement
+from typing_extensions import override
 
 from .base_search_param import SearchParam
 

@@ -53,9 +53,9 @@ def paginated_api_response(
     "total_count" is the total number of results before pagination (i.e. if there are 123 results and the page limit is
     10, there will be 10 items, but "total_count" will be 123).
 
-    If there might be a next page (which is determined e.g. by the number of results and the given pagination parameters),
-    there will be another field that contains the start value for the next page. In case of offset pagination, this
-    field will be called "next_offset", in case of cursor pagination, it will be called "next_id".
+    If it is possible that there is a next page (which is determined e.g. by the number of results and the given
+    pagination parameters), there will be another field that contains the start value for the next page. For offset
+    pagination, this field will be called "next_offset", for cursor pagination, it will be called "next_id".
 
     Additionally, if the optional parameter `request_path` is set, another field called "next_path" will be added to the
     response, containing the URL path with query parameters that can be used to retrieve the next page. This string
@@ -83,14 +83,15 @@ def paginated_api_response(
         if next_start_value is None:
             return response_data
 
-        # Write next start parameter to response. For legacy reasons, cursor pagination uses "next_id" instead of "next_start".
+        # Add next start parameter to response. For compatibility reasons, cursor pagination uses "next_id" instead of
+        # "next_start".
         # TODO: This might be changed in the future, but we need to keep compatibility somehow...
         start_param = search_query.get_start_parameter_name()
         response_data['next_id' if start_param == 'start' else f'next_{start_param}'] = next_start_value
 
         # Only set next_path if a request base path is given
         if request_path is not None:
-            # Construct parameters for next page from original request parameters (if given). Ensure limit parameter is set.
+            # Construct parameters for next page from original request (if given). Ensure limit parameter is set.
             next_path_params = dict(original_params) if original_params is not None else {}
             next_path_params.update({
                 start_param: next_start_value,

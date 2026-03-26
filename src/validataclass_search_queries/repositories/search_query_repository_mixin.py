@@ -85,8 +85,9 @@ class SearchQueryRepositoryMixin(Generic[T_Model], ABC):
 
     The default implementation of `_apply_bound_search_filter()` first gets the column of the model class with the name
     specified in the SearchParam (`getattr(self.model_cls, bound_filter.column_name)` and applies the search filter to
-    this column (`query.filter(bound_filter.get_sqlalchemy_filter(col))`). For example, with a `SearchParamSince('created')`
-    and the `Example` model, the "since" filter (i.e. `>=`) would be applied to the column `Example.created`.
+    this column (`query.filter(bound_filter.get_sqlalchemy_filter(col))`). For example, with a search parameter
+    `SearchParamSince('created')` and the `Example` model, the "since" filter (i.e. `>=`) would be applied to the
+    column `Example.created`.
 
     If you need to, you can override this method, choose a different column (maybe even from a different model, or using
     some SQL functions) and apply the search filter to this column.
@@ -148,7 +149,8 @@ class SearchQueryRepositoryMixin(Generic[T_Model], ABC):
 
     def _search_and_paginate(self, query: Query[Any], search_query: BaseSearchQuery | None) -> PaginatedResult[T_Model]:
         """
-        Filters a query based on search parameters (usually parsed from HTTP query parameters) and paginates the result.
+        Apply filters, sorting and pagination to a database query, based on search parameters (usually parsed from
+        HTTP query parameters), then execute the query and return a paginated list of results.
 
         Shortcut method for calling `_filter_by_search_query()`, `_order_by_search_query()` and `_paginate_result()`.
         """
@@ -158,7 +160,8 @@ class SearchQueryRepositoryMixin(Generic[T_Model], ABC):
 
     def _filter_by_search_query(self, query: Query[T_Query], search_query: BaseSearchQuery | None) -> Query[T_Query]:
         """
-        Filters a query based on search parameters (usually parsed from HTTP query parameters), *excluding* pagination.
+        Apply filters to a database query, based on search parameters (usually parsed from HTTP query parameters).
+        This does not include sorting or pagination!
 
         If no search query is given (or no search parameter is set), the database query is returned unmodified.
         """
@@ -173,7 +176,8 @@ class SearchQueryRepositoryMixin(Generic[T_Model], ABC):
 
     def _apply_bound_search_filter(self, query: Query[T_Query], bound_filter: BoundSearchFilter) -> Query[T_Query]:
         """
-        Filters a query based on a BoundSearchFilter. Called by _filter_by_search_query() for every set search filter.
+        Apply a single search filter from a `BoundSearchFilter` to a database query with `query.filter(...)`.
+        Called by `_filter_by_search_query()` for every set search filter.
 
         Override this method to implement custom handling for (all or specific) search filters.
         """
@@ -183,7 +187,7 @@ class SearchQueryRepositoryMixin(Generic[T_Model], ABC):
 
     def _order_by_search_query(self, query: Query[T_Query], search_query: BaseSearchQuery | None) -> Query[T_Query]:
         """
-        Applies sorting (order_by) to a query based on sorting parameters from a search query.
+        Apply sorting (`query.order_by(...)`) to a database query based on sorting parameters from a search query.
 
         If the search query does not implement sorting (i.e. it does not inherit from `AbstractSortingMixin`), the
         database query is returned unmodified.
@@ -195,13 +199,14 @@ class SearchQueryRepositoryMixin(Generic[T_Model], ABC):
 
     def _paginate_result(self, query: Query[Any], search_query: BaseSearchQuery | None) -> PaginatedResult[T_Model]:
         """
-        Applies pagination to a query based on search parameters, executes the query and returns a paginated result list.
+        Apply pagination to a database query based on search parameters, execute the query and return a paginated list
+        of results.
 
-        To define pagination parameters in your search query dataclass, use a pagination mixin like OffsetPaginationMixin
-        or StablePaginationMixin.
+        To define pagination parameters in your search query dataclass, use a pagination mixin class like
+        `OffsetPaginationMixin` or `CursorPaginationMixin`.
 
         If the search query does not implement pagination (i.e. it does not inherit from `AbstractPaginationMixin`),
-        a PaginatedResult with ALL results is returned (as if the pagination limit was set to infinity).
+        a `PaginatedResult` with ALL results is returned (as if there was no pagination limit).
         """
         # Get total count of search results BEFORE pagination is applied
         total_count = query.count()

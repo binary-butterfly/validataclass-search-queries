@@ -87,7 +87,9 @@ def test_paginated_result(input_list, total_count):
     ]
 )
 def test_paginated_result_to_dict_basic_types(paginated_result, expected_dict):
-    """ Test PaginatedResult.to_dict() with basic types and objects without to_dict() method (recursive and non-recursive). """
+    """
+    Test PaginatedResult.to_dict() with basic types and objects without to_dict() method (recursive and non-recursive).
+    """
     assert paginated_result.to_dict() == expected_dict
     assert paginated_result.to_dict(recursive=False) == expected_dict
     assert paginated_result.to_dict(recursive=True) == expected_dict
