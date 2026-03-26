@@ -46,7 +46,7 @@ class BaseSearchQuery:
     def get_search_filters(self) -> Iterator[tuple[str, BoundSearchFilter]]:
         """
         Returns an iterator that instantiates BoundSearchFilters for all search parameters in this class that are set
-        by the user (i.e. not None).
+        by the user (i.e. not None or UnsetValue).
 
         The iterator yields tuples consisting of exactly two elements: the parameter name (i.e. the field name in the
         dataclass) and the BoundSearchFilter.
