@@ -7,6 +7,7 @@ Use of this source code is governed by an MIT-style license that can be found in
 import pytest
 import sqlalchemy
 from sqlalchemy.sql import ColumnElement
+from sqlalchemy.sql.elements import ColumnClause
 from validataclass.dataclasses import validataclass, Default
 from validataclass.exceptions import DictFieldsValidationError
 from validataclass.validators import DataclassValidator, AnyOfValidator
@@ -16,8 +17,8 @@ from validataclass_search_queries.sorting import SortingMixin, SortingDirection
 
 class MockModelCls:
     """ This class is used as a mock for a database model class. """
-    id = sqlalchemy.column('id')
-    unit_test_field = sqlalchemy.column('unit_test_field')
+    id: ColumnClause[int] = sqlalchemy.column('id')
+    unit_test_field: ColumnClause[str] = sqlalchemy.column('unit_test_field')
 
 
 def test_sorting_mixin_get_sorting_column():

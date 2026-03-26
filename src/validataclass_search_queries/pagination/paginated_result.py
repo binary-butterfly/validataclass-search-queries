@@ -62,8 +62,11 @@ class PaginatedResult(list[T_Result]):
         mapped_customers = paginated_result.map(Customers.to_dict)
         ```
         """
-        # We use self.__class__() instead of PaginatedResult() to properly support subclassing
-        return self.__class__(
+        # Previously, we used self.__class__() instead of PaginatedResult() here to properly support subclassing.
+        # However, we don't know whether this potential subclass is a Generic too, so it might not even support
+        # T_MappedResult. In other words, `self.__class__` can only be a subtype of `PaginatedResult[T_Result]`,
+        # not of `PaginatedResult[T_MappedResult]`.
+        return PaginatedResult(
             map(map_func, self),
             total_count=self.total_count,
         )
