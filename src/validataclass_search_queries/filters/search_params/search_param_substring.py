@@ -5,6 +5,7 @@ Use of this source code is governed by an MIT-style license that can be found in
 """
 
 from typing import Any
+from typing_extensions import override
 
 from sqlalchemy.sql import ColumnElement
 
@@ -25,8 +26,8 @@ class SearchParamContains(SearchParam):
     interpreted as literal characters, not as wildcard characters.
     """
 
-    @staticmethod
-    def sqlalchemy_filter(column: ColumnElement, value: Any) -> ColumnElement:
+    @override
+    def sqlalchemy_filter(self, column: ColumnElement[Any], value: Any) -> ColumnElement[bool]:
         # Short-circuit if value is empty
         return column.contains(value, autoescape=True) if value else column
 
@@ -39,8 +40,8 @@ class SearchParamStartsWith(SearchParam):
     interpreted as literal characters, not as wildcard characters.
     """
 
-    @staticmethod
-    def sqlalchemy_filter(column: ColumnElement, value: Any) -> ColumnElement:
+    @override
+    def sqlalchemy_filter(self, column: ColumnElement[Any], value: Any) -> ColumnElement[bool]:
         # Short-circuit if value is empty
         return column.startswith(value, autoescape=True) if value else column
 
@@ -53,7 +54,7 @@ class SearchParamEndsWith(SearchParam):
     interpreted as literal characters, not as wildcard characters.
     """
 
-    @staticmethod
-    def sqlalchemy_filter(column: ColumnElement, value: Any) -> ColumnElement:
+    @override
+    def sqlalchemy_filter(self, column: ColumnElement[Any], value: Any) -> ColumnElement[bool]:
         # Short-circuit if value is empty
         return column.endswith(value, autoescape=True) if value else column

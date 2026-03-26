@@ -5,6 +5,7 @@ Use of this source code is governed by an MIT-style license that can be found in
 """
 
 from typing import Any
+from typing_extensions import override
 
 from sqlalchemy.sql import ColumnElement
 
@@ -22,6 +23,6 @@ class SearchParamEquals(SearchParam):
     Note: For strings, this might or might not be case sensitive, depending on your database collations.
     """
 
-    @staticmethod
-    def sqlalchemy_filter(column: ColumnElement, value: Any) -> ColumnElement:
-        return column == value
+    @override
+    def sqlalchemy_filter(self, column: ColumnElement[Any], value: Any) -> ColumnElement[bool]:
+        return column.__eq__(value)
