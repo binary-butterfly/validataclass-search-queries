@@ -6,6 +6,7 @@ Use of this source code is governed by an MIT-style license that can be found in
 
 from typing import Any, TypeVar
 
+from typing_extensions import override
 from validataclass.validators import ListValidator, Validator
 
 __all__ = [
@@ -43,7 +44,7 @@ class MultiSelectValidator(ListValidator[T_ListItem]):
 
     def __init__(
         self,
-        item_validator: Validator,
+        item_validator: Validator[T_ListItem],
         *,
         delimiter: str = ',',
         max_length: int | None = None,
@@ -64,6 +65,7 @@ class MultiSelectValidator(ListValidator[T_ListItem]):
         )
         self.delimiter = delimiter
 
+    @override
     def validate(self, input_data: Any, **kwargs) -> list[T_ListItem]:
         """
         Validate input data as string. Returns a validated list.

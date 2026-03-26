@@ -5,7 +5,7 @@ Use of this source code is governed by an MIT-style license that can be found in
 """
 
 from collections.abc import Iterable
-from typing import Any
+from typing import TypeVar
 
 from validataclass.validators import AnyOfValidator
 
@@ -15,8 +15,10 @@ __all__ = [
     'MultiSelectAnyOfValidator',
 ]
 
+T_AnyOfValues = TypeVar('T_AnyOfValues')
 
-class MultiSelectAnyOfValidator(MultiSelectValidator):
+
+class MultiSelectAnyOfValidator(MultiSelectValidator[T_AnyOfValues]):
     """
     Validator for multi-select search parameters that only allows a specified set of values.
 
@@ -26,7 +28,7 @@ class MultiSelectAnyOfValidator(MultiSelectValidator):
     def __init__(
         self,
         # AnyOfValidator settings
-        allowed_values: Iterable[Any],
+        allowed_values: Iterable[T_AnyOfValues],
         # TODO: case_insensitive is deprecated in validataclass and must be removed in a future version.
         case_sensitive: bool | None = None,
         case_insensitive: bool | None = None,
