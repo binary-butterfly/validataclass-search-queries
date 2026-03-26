@@ -8,6 +8,7 @@ from typing import Any, TypeVar, cast
 
 from sqlalchemy.orm import Query
 from sqlalchemy.sql import ColumnElement
+from typing_extensions import override
 from validataclass.dataclasses import validataclass, Default
 from validataclass.validators import IntegerValidator
 
@@ -94,13 +95,14 @@ class CursorPaginationMixin(AbstractPaginationMixin):
     # Limit: Number of entries per page
     limit: int | None = PaginationLimitValidator(max_value=100), Default(20)
 
+    @override
     def __init_subclass__(cls, **kwargs: Any):
         # Pagination mixins are not compatible with each other, only one can be used at the same time
-        if issubclass(cls, pagination.OffsetPaginationMixin):
+        if issubclass(cls, pagination.OffsetPaginationMixin):  # type: ignore[unreachable]
             raise TypeError(
                 f'Invalid base classes in {cls}: Combining multiple pagination mixins is not allowed'
             )
-        if issubclass(cls, sorting.SortingMixin):
+        if issubclass(cls, sorting.SortingMixin):  # type: ignore[unreachable]
             raise TypeError(
                 f'Invalid base classes in {cls}: CursorPaginationMixin cannot be combined with SortingMixin'
             )
@@ -131,6 +133,7 @@ class CursorPaginationMixin(AbstractPaginationMixin):
         # pretend it's always a ColumnElement to make the type checker happy.
         return cast(ColumnElement[Any], getattr(model_cls, self.get_cursor_column_name()))
 
+    @override
     def apply_pagination_to_query(self, query: Query[T], model_cls: Any) -> Query[T]:
         """
         Applies the pagination parameters to an SQLAlchemy query and returns the new query.
@@ -143,8 +146,8 @@ class CursorPaginationMixin(AbstractPaginationMixin):
             return query
 
         # The start parameter should always be set, but in case it is not, default to 0
-        if self.start is None:
-            self.start = 0
+        if self.start is None:  # type: ignore[comparison-overlap]
+            self.start = 0  # type: ignore[unreachable]
 
         # Get the cursor column from the model class
         key_column = self.get_cursor_column(model_cls)
@@ -156,12 +159,14 @@ class CursorPaginationMixin(AbstractPaginationMixin):
             .limit(self.limit)
         )
 
+    @override
     def get_start_parameter_name(self) -> str:
         """
         Returns the name of the pagination start parameter ("start" for cursor pagination).
         """
         return 'start'
 
+    @override
     def get_next_start_value(self, paginated_result: PaginatedResult[Any]) -> int | None:
         """
         Returns the next value for the pagination start parameter to retrieve the next page of data, or None if there

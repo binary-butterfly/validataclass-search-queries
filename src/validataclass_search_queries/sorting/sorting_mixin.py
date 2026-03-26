@@ -8,6 +8,7 @@ from typing import Any, TypeVar, cast
 
 from sqlalchemy.orm import Query
 from sqlalchemy.sql import ColumnElement
+from typing_extensions import override
 from validataclass.dataclasses import validataclass, Default
 from validataclass.validators import AnyOfValidator
 
@@ -60,6 +61,7 @@ class SortingMixin(AbstractSortingMixin):
     # Sorting direction ("ASC" or "DESC", case-insensitive)
     sorting_direction: SortingDirection = SortingDirectionValidator(), Default(SortingDirection.ASC)
 
+    @override
     def get_sorting_column(self, model_cls: Any) -> ColumnElement[Any]:
         """
         Returns the column that the query should be ordered by (excluding the sorting direction).
@@ -70,6 +72,7 @@ class SortingMixin(AbstractSortingMixin):
         # pretend it's always a ColumnElement to make the type checker happy.
         return cast(ColumnElement[Any], getattr(model_cls, self.sorted_by))
 
+    @override
     def apply_sorting_direction(self, column: ColumnElement[T]) -> ColumnElement[T]:
         """
         Applies the sorting direction to an SQLAlchemy column element, i.e. `column.asc()` or `column.desc()`, and
@@ -77,6 +80,7 @@ class SortingMixin(AbstractSortingMixin):
         """
         return column.desc() if self.sorting_direction is SortingDirection.DESC else column.asc()
 
+    @override
     def apply_sorting_to_query(self, query: Query[T], model_cls: Any) -> Query[T]:
         """
         Applies the sorting parameters to an SQLAlchemy query (`query.order_by()`) and returns the new query.
@@ -84,9 +88,9 @@ class SortingMixin(AbstractSortingMixin):
         The "model_cls" parameter should be the class of the database model that is queried. It is needed to get the
         sorting column from the model.
         """
-        # If we want to disable sorting for some reason
-        if self.sorted_by is None:
-            return query
+        # If someone wants to disable sorting for some reason
+        if self.sorted_by is None:  # type: ignore[comparison-overlap]
+            return query  # type: ignore[unreachable]
 
         sorting_column = self.get_sorting_column(model_cls)
         return query.order_by(self.apply_sorting_direction(sorting_column))
