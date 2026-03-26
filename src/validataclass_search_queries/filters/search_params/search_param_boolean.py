@@ -7,6 +7,7 @@ Use of this source code is governed by an MIT-style license that can be found in
 from typing import Any
 
 from sqlalchemy.sql import ColumnElement
+from typing_extensions import override
 
 from .base_search_param import SearchParam
 
@@ -23,8 +24,8 @@ class SearchParamBoolean(SearchParam):
     Boolean search parameter to filter a boolean column for true or false.
     """
 
-    @staticmethod
-    def sqlalchemy_filter(column: ColumnElement, value: Any) -> ColumnElement:
+    @override
+    def sqlalchemy_filter(self, column: ColumnElement[Any], value: Any) -> ColumnElement[bool]:
         return column.is_(bool(value))
 
 
@@ -36,21 +37,22 @@ class SearchParamIsNone(SearchParam):
     If the search parameter is False, only results where the specified column is NOT None will be included.
     """
 
-    @staticmethod
-    def sqlalchemy_filter(column: ColumnElement, value: Any) -> ColumnElement:
+    @override
+    def sqlalchemy_filter(self, column: ColumnElement[Any], value: Any) -> ColumnElement[bool]:
         return column.is_(None) if value is True else column.is_not(None)
 
 
 class SearchParamIsNotNone(SearchParam):
     """
-    Boolean search parameter to filter a column for values that are None or not None. Inverted version of SearchParamIsNone.
+    Boolean search parameter to filter a column for values that are None or not None.
+    Inverted version of SearchParamIsNone.
 
     If the search parameter is True, only results where the specified column is NOT None will be included.
     If the search parameter is False, only results where the specified column is None will be included.
     """
 
-    @staticmethod
-    def sqlalchemy_filter(column: ColumnElement, value: Any) -> ColumnElement:
+    @override
+    def sqlalchemy_filter(self, column: ColumnElement[Any], value: Any) -> ColumnElement[bool]:
         return column.is_not(None) if value is True else column.is_(None)
 
 
@@ -74,5 +76,6 @@ class SearchParamTernary(SearchParam):
         self.value_true = true
         self.value_false = false
 
-    def sqlalchemy_filter(self, column: ColumnElement, value: Any) -> ColumnElement:
-        return column == (self.value_true if value else self.value_false)
+    @override
+    def sqlalchemy_filter(self, column: ColumnElement[Any], value: Any) -> ColumnElement[bool]:
+        return column.__eq__(self.value_true if value else self.value_false)

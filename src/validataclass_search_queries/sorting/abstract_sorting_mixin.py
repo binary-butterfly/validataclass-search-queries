@@ -5,7 +5,7 @@ Use of this source code is governed by an MIT-style license that can be found in
 """
 
 from abc import ABC, abstractmethod
-from typing import Any
+from typing import Any, TypeVar
 
 from sqlalchemy.orm import Query
 from sqlalchemy.sql import ColumnElement
@@ -15,6 +15,8 @@ from .sorting_direction import SortingDirection
 __all__ = [
     'AbstractSortingMixin',
 ]
+
+T = TypeVar('T')
 
 
 class AbstractSortingMixin(ABC):
@@ -29,7 +31,7 @@ class AbstractSortingMixin(ABC):
     sorting_direction: SortingDirection
 
     @abstractmethod
-    def get_sorting_column(self, model_cls: Any) -> ColumnElement:
+    def get_sorting_column(self, model_cls: Any) -> ColumnElement[Any]:
         """
         Returns the column that the query should be ordered by (excluding the sorting direction).
 
@@ -38,7 +40,7 @@ class AbstractSortingMixin(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def apply_sorting_direction(self, column: ColumnElement) -> ColumnElement:
+    def apply_sorting_direction(self, column: ColumnElement[T]) -> ColumnElement[T]:
         """
         Applies the sorting direction to an SQLAlchemy column element, i.e. `column.asc()` or `column.desc()`, and
         returns the new column element.
@@ -46,7 +48,7 @@ class AbstractSortingMixin(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def apply_sorting_to_query(self, query: Query, model_cls: Any) -> Query:
+    def apply_sorting_to_query(self, query: Query[T], model_cls: Any) -> Query[T]:
         """
         Applies the sorting parameters to an SQLAlchemy query (`query.order_by()`) and returns the new query.
 

@@ -52,9 +52,8 @@ class SearchParam(ABC):
     def __init__(self, column_name: str | None = None):
         self.column_name = column_name
 
-    @staticmethod  # pragma: nocover
-    @abstractmethod
-    def sqlalchemy_filter(column: ColumnElement, value: Any) -> ColumnElement:
+    @abstractmethod  # pragma: nocover
+    def sqlalchemy_filter(self, column: ColumnElement[Any], value: Any) -> ColumnElement[bool]:
         """
         This abstract method defines the SQLAlchemy filter expression. See existing implementations for examples.
         """

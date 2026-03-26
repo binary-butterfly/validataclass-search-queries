@@ -5,3 +5,7 @@ Use of this source code is governed by an MIT-style license that can be found in
 """
 
 from .search_query_repository_mixin import SearchQueryRepositoryMixin
+
+__all__ = [
+    'SearchQueryRepositoryMixin',
+]

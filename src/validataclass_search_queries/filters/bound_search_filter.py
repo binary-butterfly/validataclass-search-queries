@@ -69,7 +69,7 @@ class BoundSearchFilter:
         """
         return self.search_param.column_name or self.param_name
 
-    def get_sqlalchemy_filter(self, column: ColumnElement) -> ColumnElement:
+    def get_sqlalchemy_filter(self, column: ColumnElement[Any]) -> ColumnElement[bool]:
         """
         Returns an SQLAlchemy filter for the given column (can be any ColumnElement, i.e. any SQLAlchemy expression that
         can be used in a WHERE clause) based on the filter function defined by the SearchParam.

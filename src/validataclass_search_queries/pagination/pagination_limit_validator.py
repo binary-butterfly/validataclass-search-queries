@@ -6,8 +6,9 @@ Use of this source code is governed by an MIT-style license that can be found in
 
 from typing import Any
 
+from typing_extensions import override
 from validataclass.exceptions import ValidationError
-from validataclass.validators import IntegerValidator
+from validataclass.validators import IntegerValidator, Validator
 
 __all__ = [
     'PaginationLimitValidator',
@@ -15,7 +16,7 @@ __all__ = [
 ]
 
 
-class PaginationLimitValidator(IntegerValidator):
+class PaginationLimitValidator(Validator[int | None]):
     """
     Validator for the pagination limit, based on an IntegerValidator.
 
@@ -44,6 +45,9 @@ class PaginationLimitValidator(IntegerValidator):
     ```
     """
 
+    # Base validator for integer validation
+    integer_validator: IntegerValidator
+
     # If true, pagination is optional for the user (set limit=0 to disable pagination)
     optional: bool
 
@@ -60,17 +64,19 @@ class PaginationLimitValidator(IntegerValidator):
         meaning that pagination is disabled (i.e. unlimited results).
 
         Parameters:
-            optional: Boolean, whether pagination is optional, i.e. the user can set limit=0 to disable pagination (default: False)
-            max_value: Integer or None, maximum value for pagination limit (default: IntegerValidator.DEFAULT_MAX_VALUE = 2147483647)
+            `optional`: bool, whether pagination can be disabled by setting limit to 0 (default: False)
+            `max_value`: int or None, maximum value for pagination limit (default: `IntegerValidator.DEFAULT_MAX_VALUE`)
         """
-        super().__init__(
-            min_value=0,  # if optional else 1,
+        # Initialize base integer validator
+        self.integer_validator = IntegerValidator(
+            min_value=0,
             max_value=max_value,
             allow_strings=True,
         )
         self.optional = optional
 
-    def validate(self, input_data: Any, **kwargs) -> int | None:
+    @override
+    def validate(self, input_data: Any, **kwargs: Any) -> int | None:
         """
         Validates the input as an integer. Returns the integer or None if the input is 0 or None.
         """
@@ -79,7 +85,7 @@ class PaginationLimitValidator(IntegerValidator):
             input_data = 0
 
         # Validate input as integer
-        validated_input = super().validate(input_data, **kwargs)
+        validated_input = self.integer_validator.validate(input_data, **kwargs)
 
         # If pagination is optional, treat 0 as "no limit" (i.e. no pagination)
         if validated_input == 0:

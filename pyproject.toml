@@ -9,3 +9,54 @@ build-backend = "setuptools.build_meta"
 [tool.setuptools_scm]
 write_to = "src/validataclass_search_queries/_version.py"
 version_scheme = "post-release"
+
+[tool.mypy]
+files = ["src/", "tests/"]
+mypy_path = "src/"
+explicit_package_bases = true
+
+# Enable validataclass mypy plugin
+plugins = [
+    "validataclass.mypy.plugin",
+]
+
+# Enable strict type checking
+strict = true
+
+# Enable further checks that are not included in strict mode
+disallow_any_unimported = true
+strict_equality_for_none = true
+warn_unreachable = true
+enable_error_code = [
+    "deprecated",
+    "explicit-override",
+    "ignore-without-code",
+    "mutable-override",
+    "possibly-undefined",
+    "redundant-expr",
+    "redundant-self",
+    "truthy-bool",
+    "truthy-iterable",
+    "unused-awaitable",
+]
+
+[[tool.mypy.overrides]]
+module = 'tests.*'
+
+# Don't enforce typed definitions in tests, this is a lot of unnecessary work (most parameters would be Any anyway).
+allow_untyped_defs = true
+
+[tool.validataclass_mypy]
+# Allow incompatible overrides for fields in validataclass sub classes (this is the default, but the default might be
+# changed in the future).
+allow_incompatible_field_overrides = true
+
+# Declare @search_query_dataclass as a decorator that creates validataclasses
+custom_validataclass_decorators = [
+    "validataclass_search_queries.search_queries.search_query_dataclass.search_query_dataclass",
+]
+
+# Ignore SearchParam objects in validataclass field definitions
+ignore_custom_types_in_fields = [
+    "validataclass_search_queries.filters.search_params.base_search_param.SearchParam",
+]

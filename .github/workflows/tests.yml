@@ -25,6 +25,8 @@ jobs:
           - '3.10'
           - '3.11'
           - '3.12'
+          - '3.13'
+          - '3.14'
         sqlalchemy-version:
           - '1.4'
           - '2.0'
@@ -42,7 +44,7 @@ jobs:
 
       - name: Run test suite with tox
         # Run tox using the version of Python in `PATH`
-        run: tox run -e clean,py-sqlalchemy${{ matrix.sqlalchemy-version }},report,flake8 -- --junit-xml=reports/pytest_${{ matrix.python-version }}_sqlalchemy${{ matrix.sqlalchemy-version }}.xml
+        run: tox run -e clean,py-sqlalchemy${{ matrix.sqlalchemy-version }},report,flake8,mypy -- --junit-xml=reports/pytest_${{ matrix.python-version }}_sqlalchemy${{ matrix.sqlalchemy-version }}.xml
 
       - name: Upload test result artifacts
         uses: actions/upload-artifact@v4

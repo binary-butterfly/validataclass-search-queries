@@ -329,37 +329,37 @@ def test_search_query_dataclass_with_invalid_values():
     with pytest.raises(DataclassValidatorFieldException) as exception_info:
         @search_query_dataclass
         class InvalidSearchQueryDataclass:
-            foo: int
+            foo: int  # type: ignore[validataclass]
 
-    assert str(exception_info.value) == 'Dataclass field "foo" must specify a Validator.'
+    assert str(exception_info.value) == 'Dataclass field "foo" must specify a validator.'
 
 
 @pytest.mark.parametrize(
     'field_tuple, expected_exception_msg',
     [
         # Missing validator
-        (None, 'Dataclass field "foo" must specify a Validator.'),
-        ((Default(3)), 'Dataclass field "foo" must specify a Validator.'),
-        ((SearchParamEquals(), Default(0)), 'Dataclass field "foo" must specify a Validator.'),
+        (None, 'Dataclass field "foo" must specify a validator.'),
+        ((Default(3)), 'Dataclass field "foo" must specify a validator.'),
+        ((SearchParamEquals(), Default(0)), 'Dataclass field "foo" must specify a validator.'),
 
         # Too many validators
         (
             (IntegerValidator(), StringValidator()),
-            'Dataclass field "foo": Only one Validator can be specified.',
+            'Dataclass field "foo": Only one validator can be specified.',
         ),
         (
             (SearchParamEquals(), IntegerValidator(), IntegerValidator()),
-            'Dataclass field "foo": Only one Validator can be specified.',
+            'Dataclass field "foo": Only one validator can be specified.',
         ),
 
         # Too many defaults
         (
             (Default(1), IntegerValidator(), Default(2)),
-            'Dataclass field "foo": Only one Default can be specified.',
+            'Dataclass field "foo": Only one default can be specified.',
         ),
         (
             (Default(1), SearchParamEquals(), IntegerValidator(), Default(2)),
-            'Dataclass field "foo": Only one Default can be specified.',
+            'Dataclass field "foo": Only one default can be specified.',
         ),
 
         # Too many SearchParams
@@ -378,6 +378,6 @@ def test_search_query_dataclass_with_invalid_field_tuples(field_tuple, expected_
     with pytest.raises(DataclassValidatorFieldException) as exception_info:
         @search_query_dataclass
         class InvalidSearchQueryDataclass:
-            foo: int = field_tuple
+            foo: int = field_tuple  # type: ignore[validataclass]
 
     assert str(exception_info.value) == expected_exception_msg
