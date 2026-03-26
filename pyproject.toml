@@ -21,11 +21,7 @@ plugins = [
 ]
 
 # Enable strict type checking
-# TODO: Enable strict mode!
-#strict = true
-
-# TODO: This is included in strict and can be removed when enabling strict mode.
-check_untyped_defs = true
+strict = true
 
 # Enable further checks that are not included in strict mode
 # TODO: Enable more checks!

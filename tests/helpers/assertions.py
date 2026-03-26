@@ -9,7 +9,7 @@ from typing import Any
 from sqlalchemy.sql import ColumnElement
 
 
-def assert_column_element(element: Any, expected_string: str, *expected_params) -> None:
+def assert_column_element(element: Any, expected_string: str, *expected_params: Any) -> None:
     """ Helper function to check the SQL and bound parameters of a generated ColumnElement. """
     assert isinstance(element, ColumnElement)
     compiled_expr = element.compile()

@@ -5,10 +5,16 @@ Use of this source code is governed by an MIT-style license that can be found in
 """
 
 from dataclasses import dataclass
+from typing import Any
 
 import pytest
 
-from validataclass_search_queries.pagination import CursorPaginationMixin, OffsetPaginationMixin, PaginatedResult, paginated_api_response
+from validataclass_search_queries.pagination import (
+    CursorPaginationMixin,
+    OffsetPaginationMixin,
+    PaginatedResult,
+    paginated_api_response,
+)
 from validataclass_search_queries.search_queries import BaseSearchQuery, search_query_dataclass
 
 
@@ -17,7 +23,7 @@ class MockItem:
     """ Object used to test the response helper functions. """
     id: int
 
-    def to_dict(self) -> dict:
+    def to_dict(self) -> dict[str, Any]:
         return {'id': self.id}
 
 
@@ -41,7 +47,7 @@ class ExampleQueryOffsetPagination(OffsetPaginationMixin, BaseSearchQuery):
             {
                 'items': [1, 3, 1, 2],
                 'total_count': 10,
-            }
+            },
         ),
         (
             # Empty result (implies last page)
@@ -50,7 +56,7 @@ class ExampleQueryOffsetPagination(OffsetPaginationMixin, BaseSearchQuery):
             {
                 'items': [],
                 'total_count': 10,
-            }
+            },
         ),
         (
             # Full page with cursor pagination
@@ -60,7 +66,7 @@ class ExampleQueryOffsetPagination(OffsetPaginationMixin, BaseSearchQuery):
                 'items': [{'id': 13}, {'id': 37}, {'id': 41}],
                 'total_count': 10,
                 'next_id': 42,
-            }
+            },
         ),
         (
             # Full page with offset pagination
@@ -70,7 +76,7 @@ class ExampleQueryOffsetPagination(OffsetPaginationMixin, BaseSearchQuery):
                 'items': [{'id': 13}, {'id': 37}, {'id': 41}],
                 'total_count': 10,
                 'next_offset': 9,
-            }
+            },
         ),
         (
             # Non-full page (implies last page)
@@ -79,9 +85,9 @@ class ExampleQueryOffsetPagination(OffsetPaginationMixin, BaseSearchQuery):
             {
                 'items': [{'id': 99}],
                 'total_count': 10,
-            }
+            },
         ),
-    ]
+    ],
 )
 def test_paginated_api_response(paginated_result, search_query, expected_response):
     """ Test paginated_api_response() with different search queries and results. """
@@ -104,7 +110,7 @@ def test_paginated_api_response(paginated_result, search_query, expected_respons
                 'total_count': 10,
                 'next_id': 42,
                 'next_path': '/unit/test?start=42&limit=3',
-            }
+            },
         ),
         (
             # Full page with offset pagination
@@ -116,7 +122,7 @@ def test_paginated_api_response(paginated_result, search_query, expected_respons
                 'total_count': 10,
                 'next_offset': 9,
                 'next_path': '/unit/test?offset=9&limit=3',
-            }
+            },
         ),
         (
             # With original parameters (numbers are strings here, like in HTTP query parameters)
@@ -128,9 +134,9 @@ def test_paginated_api_response(paginated_result, search_query, expected_respons
                 'total_count': 10,
                 'next_offset': 9,
                 'next_path': '/unit/test?foo=bar&limit=3&offset=9&something=else',
-            }
+            },
         ),
-    ]
+    ],
 )
 def test_paginated_api_response_with_next_path(paginated_result, search_query, original_params, expected_response):
     """ Test paginated_api_response() with request_path and original_params to generate the "next_path" field. """

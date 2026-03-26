@@ -5,7 +5,7 @@ Use of this source code is governed by an MIT-style license that can be found in
 """
 
 from abc import ABC, abstractmethod
-from typing import Any
+from typing import Any, TypeVar
 
 from sqlalchemy.orm import Query
 
@@ -14,6 +14,8 @@ from .paginated_result import PaginatedResult
 __all__ = [
     'AbstractPaginationMixin',
 ]
+
+T = TypeVar('T')
 
 
 class AbstractPaginationMixin(ABC):
@@ -25,7 +27,7 @@ class AbstractPaginationMixin(ABC):
     limit: int | None
 
     @abstractmethod
-    def apply_pagination_to_query(self, query: Query, model_cls: Any) -> Query:
+    def apply_pagination_to_query(self, query: Query[T], model_cls: Any) -> Query[T]:
         """
         Applies the pagination parameters to an SQLAlchemy query and returns the new query.
 
@@ -45,7 +47,7 @@ class AbstractPaginationMixin(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def get_next_start_value(self, paginated_result: PaginatedResult) -> int | None:
+    def get_next_start_value(self, paginated_result: PaginatedResult[Any]) -> int | None:
         """
         Returns the next value for the pagination start parameter (see also: `get_start_parameter_name()`) to retrieve
         the next page of data, or None if there is no next page.
