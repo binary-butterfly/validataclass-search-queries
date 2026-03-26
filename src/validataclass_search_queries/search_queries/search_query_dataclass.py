@@ -20,6 +20,14 @@ __all__ = [
     'search_query_dataclass',
 ]
 
+
+@dataclasses.dataclass
+class _ValidatorField:
+    validator: Validator[Any] | None = None
+    default: BaseDefault[Any] | None = None
+    search_param: SearchParam | None = None
+
+
 _T = TypeVar('_T')
 
 
@@ -32,7 +40,7 @@ def search_query_dataclass(cls: type[_T]) -> type[_T]:
 
 
 @overload
-def search_query_dataclass(cls: None = None, /, **kwargs) -> Callable[[type[_T]], type[_T]]:
+def search_query_dataclass(cls: None = None, /, **kwargs: Any) -> Callable[[type[_T]], type[_T]]:
     ...
 
 
@@ -63,7 +71,10 @@ def search_query_dataclass(
     """
 
     def decorator(_cls: type[_T]) -> type[_T]:
+        # Transform class to be a valid validataclass
         _prepare_search_query_dataclass(_cls)
+
+        # Use @validataclass decorator to transform class into a validataclass
         return validataclass(_cls, **kwargs)
 
     # Allow decorator to be called with and without parenthesis
@@ -89,37 +100,51 @@ def _prepare_search_query_dataclass(cls) -> None:
             continue
 
         # Get current validator etc. if the field is already existing
-        field_args = existing_fields.get(name, {})
+        existing_field = existing_fields.get(name, _ValidatorField())
 
-        # Overwrite existing field arguments with validator etc. from tuple
+        # Parse field tuple
         try:
-            field_args.update(_parse_validator_tuple(value))
+            parsed_field = _parse_validator_tuple(value)
         except Exception as e:
             raise DataclassValidatorFieldException(f'Dataclass field "{name}": {e}')
 
+        # Overwrite existing field arguments with validator etc. from tuple
+        field = _ValidatorField(
+            validator=parsed_field.validator or existing_field.validator,
+            default=parsed_field.default or existing_field.default,
+            search_param=parsed_field.search_param or existing_field.search_param,
+        )
+
         # Ignore all fields without a SearchParam (they will be handled by @validataclass as usual validataclass fields)
-        if 'search_param' not in field_args.keys():
+        if field.search_param is None:
             continue
 
         # Ensure that a validator is set
-        if not isinstance(field_args.get('validator', None), Validator):
+        if not isinstance(field.validator, Validator):
             raise DataclassValidatorFieldException(f'Dataclass field "{name}" must specify a validator.')
 
         # For SearchParam fields, use Default(None) if no explicit default was set
-        if field_args.get('default', None) is None:
-            field_args['default'] = Default(None)
+        if field.default is None:
+            field.default = Default(None)
 
         # Create validataclass field
         setattr(cls, name, validataclass_field(
-            validator=field_args.get('validator'),
-            default=field_args.get('default'),
-            metadata={'search_param': field_args.get('search_param')},
+            validator=field.validator,
+            default=field.default,
+            metadata={'search_param': field.search_param},
         ))
 
 
-def _get_existing_validator_fields(cls) -> dict[str, dict[str, Any]]:
+def _get_existing_validator_fields(cls) -> dict[str, _ValidatorField]:
     """
-    Internal helper function used by @search_query_dataclass to get all pre-existing validataclass fields from the base classes.
+    Returns a dictionary containing all fields (as `_ValidatorField` objects) of an existing validataclass that have a
+    validator set in their metadata, or an empty dictionary if the class is not a dataclass (yet).
+
+    Existing dataclass fields are determined by looking at all direct parent classes that are dataclasses themselves.
+    If two unrelated base classes define a field with the same name, the most-left class takes precedence (for example,
+    in `class C(B, A)`, the definitions of B take precendence over A).
+
+    (Internal helper function.)
     """
     existing_fields = {}
 
@@ -128,43 +153,46 @@ def _get_existing_validator_fields(cls) -> dict[str, dict[str, Any]]:
             continue
 
         for field in dataclasses.fields(base_cls):
-            existing_fields[field.name] = {
-                'validator': field.metadata.get('validator', None),
-                'default': field.metadata.get('validator_default', None),
-                'search_param': field.metadata.get('search_param', None),
-            }
+            existing_fields[field.name] = _ValidatorField(
+                validator=field.metadata.get('validator', None),
+                default=field.metadata.get('validator_default', None),
+                search_param=field.metadata.get('search_param', None),
+            )
 
     return existing_fields
 
 
-def _parse_validator_tuple(args: Any) -> dict:
+def _parse_validator_tuple(args: Any) -> _ValidatorField:
     """
-    Internal helper function used by @search_query_dataclass to parse validataclass-style field tuples to dictionaries.
+    Parses field arguments (the value of a field in a dataclass that has not been parsed by `@dataclass` yet) to a
+    `_ValidatorField` object.
+
+    (Internal helper function.)
     """
     if args is None:
-        return {}
+        return _ValidatorField()
 
     # Ensure args is a tuple
     if not isinstance(args, tuple):
         args = (args,)
 
     # Find validator, default object and search param in tuple and return them as a dictionary
-    arg_dict = {}
+    field = _ValidatorField()
 
     for arg in args:
         if isinstance(arg, Validator):
-            if 'validator' in arg_dict:
+            if field.validator is not None:
                 raise ValueError('Only one validator can be specified.')
-            arg_dict['validator'] = arg
+            field.validator = arg
         elif isinstance(arg, BaseDefault):
-            if 'default' in arg_dict:
+            if field.default is not None:
                 raise ValueError('Only one default can be specified.')
-            arg_dict['default'] = arg
+            field.default = arg
         elif isinstance(arg, SearchParam):
-            if 'search_param' in arg_dict:
+            if field.search_param is not None:
                 raise ValueError('Only one SearchParam can be specified.')
-            arg_dict['search_param'] = arg
+            field.search_param = arg
         else:
             raise TypeError('Unexpected type of argument: ' + type(arg).__name__)
 
-    return arg_dict
+    return field
