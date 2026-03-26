@@ -9,3 +9,42 @@ build-backend = "setuptools.build_meta"
 [tool.setuptools_scm]
 write_to = "src/validataclass_search_queries/_version.py"
 version_scheme = "post-release"
+
+[tool.mypy]
+files = ["src/", "tests/"]
+mypy_path = "src/"
+explicit_package_bases = true
+
+# Enable strict type checking
+# TODO: Enable strict mode!
+#strict = true
+
+# TODO: This is included in strict and can be removed when enabling strict mode.
+check_untyped_defs = true
+
+# Enable further checks that are not included in strict mode
+# TODO: Enable more checks!
+#disallow_any_unimported = true
+#strict_equality_for_none = true
+#warn_unreachable = true
+#enable_error_code = [
+#    "deprecated",
+#    "explicit-override",
+#    "ignore-without-code",
+#    "mutable-override",
+#    "possibly-undefined",
+#    "redundant-expr",
+#    "redundant-self",
+#    "truthy-bool",
+#    "truthy-iterable",
+#    "unused-awaitable",
+#]
+
+# TODO: Remove this after enabling the validataclass mypy plugin.
+disable_error_code = "assignment"
+
+[[tool.mypy.overrides]]
+module = 'tests.*'
+
+# Don't enforce typed definitions in tests, this is a lot of unnecessary work (most parameters would be Any anyway).
+allow_untyped_defs = true
