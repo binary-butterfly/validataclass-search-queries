@@ -95,9 +95,13 @@ class CursorPaginationMixin(AbstractPaginationMixin):
     def __init_subclass__(cls, **kwargs):
         # Pagination mixins are not compatible with each other, only one can be used at the same time
         if issubclass(cls, pagination.OffsetPaginationMixin):
-            raise TypeError(f'Invalid base classes in {cls}: Combining multiple pagination mixins is not allowed')
+            raise TypeError(
+                f'Invalid base classes in {cls}: Combining multiple pagination mixins is not allowed'
+            )
         if issubclass(cls, sorting.SortingMixin):
-            raise TypeError(f'Invalid base classes in {cls}: CursorPaginationMixin cannot be combined with SortingMixin')
+            raise TypeError(
+                f'Invalid base classes in {cls}: CursorPaginationMixin cannot be combined with SortingMixin'
+            )
 
         super().__init_subclass__(**kwargs)
 
@@ -142,9 +146,11 @@ class CursorPaginationMixin(AbstractPaginationMixin):
         key_column = self.get_cursor_column(model_cls)
 
         # Cursor pagination requires the data to be ordered by the cursor column
-        return query.order_by(key_column) \
-            .filter(key_column >= self.start) \
+        return (
+            query.order_by(key_column)
+            .filter(key_column >= self.start)
             .limit(self.limit)
+        )
 
     def get_start_parameter_name(self) -> str:
         """
@@ -170,11 +176,16 @@ class CursorPaginationMixin(AbstractPaginationMixin):
         # Get last result in list
         last_item = paginated_result[-1]
 
-        # Get cursor value (e.g. ID) of last result, allowing both objects and dictionaries, and increment by one
+        # Get cursor value (e.g. ID) of last result, allowing both objects and dictionaries
         cursor_key = self.get_cursor_column_name()
         if isinstance(last_item, dict):
-            return last_item.get(cursor_key) + 1
+            last_item_value = last_item.get(cursor_key)
         elif hasattr(last_item, cursor_key):
-            return getattr(last_item, cursor_key) + 1
+            last_item_value = getattr(last_item, cursor_key)
         else:
-            raise Exception(f'Last item of PaginatedResult has neither attribute nor dictionary key "{cursor_key}": {last_item}')
+            raise Exception(
+                f'Last item of PaginatedResult has neither attribute nor dictionary key "{cursor_key}": {last_item}'
+            )
+
+        # Return last cursor value incremented by one
+        return last_item_value + 1 if isinstance(last_item_value, int) else None

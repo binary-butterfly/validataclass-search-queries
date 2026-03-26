@@ -18,6 +18,7 @@ __all__ = [
 ]
 
 
+@dataclasses.dataclass
 class BaseSearchQuery:
     """
     Base class for search query validataclasses, which can be used to validate search parameters (e.g. GET query
