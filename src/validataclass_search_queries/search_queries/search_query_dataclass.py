@@ -6,10 +6,11 @@ Use of this source code is governed by an MIT-style license that can be found in
 
 import dataclasses
 from collections.abc import Callable
+from inspect import get_annotations
 from typing import Any, TypeVar, overload
 
 from typing_extensions import dataclass_transform
-from validataclass.dataclasses import validataclass, validataclass_field, Default
+from validataclass.dataclasses import validataclass, validataclass_field, BaseDefault, Default
 from validataclass.exceptions import DataclassValidatorFieldException
 from validataclass.validators import Validator
 
@@ -76,8 +77,8 @@ def _prepare_search_query_dataclass(cls) -> None:
     # In case of a subclassed dataclass, get the already existing fields
     existing_fields = _get_existing_validator_fields(cls)
 
-    # Get class annotations
-    cls_annotations = cls.__dict__.get('__annotations__', {})
+    # Get annotations of this class (ignores base classes)
+    cls_annotations = get_annotations(cls)
 
     # Prepare dataclass fields by checking for validators and setting metadata accordingly
     for name, field_type in cls_annotations.items():
@@ -102,8 +103,7 @@ def _prepare_search_query_dataclass(cls) -> None:
 
         # Ensure that a validator is set
         if not isinstance(field_args.get('validator', None), Validator):
-            # TODO: Update exception messages to be consistent with validataclass 0.12.0
-            raise DataclassValidatorFieldException(f'Dataclass field "{name}" must specify a Validator.')
+            raise DataclassValidatorFieldException(f'Dataclass field "{name}" must specify a validator.')
 
         # For SearchParam fields, use Default(None) if no explicit default was set
         if field_args.get('default', None) is None:
@@ -151,15 +151,14 @@ def _parse_validator_tuple(args: Any) -> dict:
     # Find validator, default object and search param in tuple and return them as a dictionary
     arg_dict = {}
 
-    # TODO: Update exception messages to be consistent with validataclass 0.12.0
     for arg in args:
         if isinstance(arg, Validator):
             if 'validator' in arg_dict:
-                raise ValueError('Only one Validator can be specified.')
+                raise ValueError('Only one validator can be specified.')
             arg_dict['validator'] = arg
-        elif isinstance(arg, Default):
+        elif isinstance(arg, BaseDefault):
             if 'default' in arg_dict:
-                raise ValueError('Only one Default can be specified.')
+                raise ValueError('Only one default can be specified.')
             arg_dict['default'] = arg
         elif isinstance(arg, SearchParam):
             if 'search_param' in arg_dict:
