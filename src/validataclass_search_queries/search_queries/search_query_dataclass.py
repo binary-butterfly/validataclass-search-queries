@@ -10,6 +10,7 @@ from typing import Any, TypeVar, overload
 
 from typing_extensions import dataclass_transform
 from validataclass.dataclasses import validataclass, validataclass_field, Default
+from validataclass.exceptions import DataclassValidatorFieldException
 from validataclass.validators import Validator
 
 from ..filters import SearchParam
@@ -90,7 +91,10 @@ def _prepare_search_query_dataclass(cls) -> None:
         field_args = existing_fields.get(name, {})
 
         # Overwrite existing field arguments with validator etc. from tuple
-        field_args.update(_parse_validator_tuple(value))
+        try:
+            field_args.update(_parse_validator_tuple(value))
+        except Exception as e:
+            raise DataclassValidatorFieldException(f'Dataclass field "{name}": {e}')
 
         # Ignore all fields without a SearchParam (they will be handled by @validataclass as usual validataclass fields)
         if 'search_param' not in field_args.keys():
@@ -98,7 +102,8 @@ def _prepare_search_query_dataclass(cls) -> None:
 
         # Ensure that a validator is set
         if not isinstance(field_args.get('validator', None), Validator):
-            raise ValueError(f'Dataclass field "{name}" must specify a Validator.')
+            # TODO: Update exception messages to be consistent with validataclass 0.12.0
+            raise DataclassValidatorFieldException(f'Dataclass field "{name}" must specify a Validator.')
 
         # For SearchParam fields, use Default(None) if no explicit default was set
         if field_args.get('default', None) is None:
@@ -147,6 +152,7 @@ def _parse_validator_tuple(args: Any) -> dict:
     # Find validator, default object and search param in tuple and return them as a dictionary
     arg_dict = {}
 
+    # TODO: Update exception messages to be consistent with validataclass 0.12.0
     for arg in args:
         if isinstance(arg, Validator):
             if 'validator' in arg_dict:
