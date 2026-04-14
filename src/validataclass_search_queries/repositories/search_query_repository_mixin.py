@@ -147,7 +147,7 @@ class SearchQueryRepositoryMixin(Generic[T_Model], ABC):
         """
         raise NotImplementedError
 
-    def _search_and_paginate(self, query: Query[Any], search_query: BaseSearchQuery | None) -> PaginatedResult[T_Model]:
+    def _search_and_paginate(self, query: 'Query[Any]', search_query: BaseSearchQuery | None) -> PaginatedResult[T_Model]:
         """
         Apply filters, sorting and pagination to a database query, based on search parameters (usually parsed from
         HTTP query parameters), then execute the query and return a paginated list of results.
@@ -158,7 +158,7 @@ class SearchQueryRepositoryMixin(Generic[T_Model], ABC):
         query = self._order_by_search_query(query, search_query)
         return self._paginate_result(query, search_query)
 
-    def _filter_by_search_query(self, query: Query[T_Query], search_query: BaseSearchQuery | None) -> Query[T_Query]:
+    def _filter_by_search_query(self, query: 'Query[T_Query]', search_query: BaseSearchQuery | None) -> 'Query[T_Query]':
         """
         Apply filters to a database query, based on search parameters (usually parsed from HTTP query parameters).
         This does not include sorting or pagination!
@@ -174,7 +174,7 @@ class SearchQueryRepositoryMixin(Generic[T_Model], ABC):
 
         return query
 
-    def _apply_bound_search_filter(self, query: Query[T_Query], bound_filter: BoundSearchFilter) -> Query[T_Query]:
+    def _apply_bound_search_filter(self, query: 'Query[T_Query]', bound_filter: BoundSearchFilter) -> 'Query[T_Query]':
         """
         Apply a single search filter from a `BoundSearchFilter` to a database query with `query.filter(...)`.
         Called by `_filter_by_search_query()` for every set search filter.
@@ -185,7 +185,7 @@ class SearchQueryRepositoryMixin(Generic[T_Model], ABC):
         col = getattr(self.model_cls, bound_filter.column_name)
         return query.filter(bound_filter.get_sqlalchemy_filter(col))
 
-    def _order_by_search_query(self, query: Query[T_Query], search_query: BaseSearchQuery | None) -> Query[T_Query]:
+    def _order_by_search_query(self, query: 'Query[T_Query]', search_query: BaseSearchQuery | None) -> 'Query[T_Query]':
         """
         Apply sorting (`query.order_by(...)`) to a database query based on sorting parameters from a search query.
 
@@ -197,7 +197,7 @@ class SearchQueryRepositoryMixin(Generic[T_Model], ABC):
 
         return query
 
-    def _paginate_result(self, query: Query[Any], search_query: BaseSearchQuery | None) -> PaginatedResult[T_Model]:
+    def _paginate_result(self, query: 'Query[Any]', search_query: BaseSearchQuery | None) -> PaginatedResult[T_Model]:
         """
         Apply pagination to a database query based on search parameters, execute the query and return a paginated list
         of results.

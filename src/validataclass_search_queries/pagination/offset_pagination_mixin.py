@@ -99,7 +99,7 @@ class OffsetPaginationMixin(AbstractPaginationMixin):
         super().__init_subclass__(**kwargs)
 
     @override
-    def apply_pagination_to_query(self, query: Query[T], model_cls: Any) -> Query[T]:
+    def apply_pagination_to_query(self, query: 'Query[T]', model_cls: Any) -> 'Query[T]':
         """
         Applies the pagination parameters to an SQLAlchemy query and returns the new query.
 
