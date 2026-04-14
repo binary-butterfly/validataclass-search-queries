@@ -29,6 +29,11 @@ build:
 tox:
 	tox run
 
+# Run tox suite with the latest installed Python version and SQLAlchemy 2.0
+.PHONY: tox-latest
+tox-latest:
+	tox run -e clean,py-sqlalchemy2.0,report,flake8,mypy
+
 # Run tox in venv (needs to be installed with `make venv` first)
 .PHONY: venv-tox
 venv-tox:
