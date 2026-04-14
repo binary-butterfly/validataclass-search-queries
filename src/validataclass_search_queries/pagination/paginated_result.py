@@ -5,12 +5,10 @@ Use of this source code is governed by an MIT-style license that can be found in
 """
 
 from collections.abc import Callable, Iterable
-from typing import TypeVar
+from typing import Any, TypeVar
 
 __all__ = [
     'PaginatedResult',
-    'T_Result',
-    'T_MappedResult',
 ]
 
 T_Result = TypeVar('T_Result')
@@ -60,17 +58,20 @@ class PaginatedResult(list[T_Result]):
         # This results in a PaginatedResult[dict] containing dictionaries as defined in map_customers above:
         mapped_customers = paginated_result.map(map_customers)
 
-        # Assuming that the Customer class has a similar method `to_dict()` that takes no arguments, we can also do this:
+        # If the Customer class has a similar method `to_dict()` that takes no arguments, we can also do this:
         mapped_customers = paginated_result.map(Customers.to_dict)
         ```
         """
-        # We use self.__class__() instead of PaginatedResult() to properly support subclassing
-        return self.__class__(
+        # Previously, we used self.__class__() instead of PaginatedResult() here to properly support subclassing.
+        # However, we don't know whether this potential subclass is a Generic too, so it might not even support
+        # T_MappedResult. In other words, `self.__class__` can only be a subtype of `PaginatedResult[T_Result]`,
+        # not of `PaginatedResult[T_MappedResult]`.
+        return PaginatedResult(
             map(map_func, self),
             total_count=self.total_count,
         )
 
-    def to_dict(self, *, recursive: bool = False) -> dict:
+    def to_dict(self, *, recursive: bool = False) -> dict[str, Any]:
         """
         Returns a dictionary representing the PaginatedResult, consisting of the keys "items" (a list of the items) and
         "total_count" (the total count as an integer).

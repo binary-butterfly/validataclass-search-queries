@@ -48,5 +48,13 @@ def test_search_param_is_not_none(sqlalchemy_column):
 def test_search_param_ternary(sqlalchemy_column):
     """ Test the SearchParamTernary search parameter. """
     param = SearchParamTernary('yes', 'no')
-    assert_column_element(param.sqlalchemy_filter(sqlalchemy_column, True), 'unit_test_column = :unit_test_column_1', 'yes')
-    assert_column_element(param.sqlalchemy_filter(sqlalchemy_column, False), 'unit_test_column = :unit_test_column_1', 'no')
+    assert_column_element(
+        param.sqlalchemy_filter(sqlalchemy_column, True),
+        'unit_test_column = :unit_test_column_1',
+        'yes',
+    )
+    assert_column_element(
+        param.sqlalchemy_filter(sqlalchemy_column, False),
+        'unit_test_column = :unit_test_column_1',
+        'no',
+    )

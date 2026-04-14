@@ -29,7 +29,7 @@ class MultiSelectEnumValidator(MultiSelectValidator[T_Enum]):
     def __init__(
         self,
         # EnumValidator settings
-        enum_cls: type[Enum],
+        enum_cls: type[T_Enum],
         *,
         allowed_values: Iterable[Any] | None = None,
         # TODO: case_insensitive is deprecated in validataclass and must be removed in a future version.

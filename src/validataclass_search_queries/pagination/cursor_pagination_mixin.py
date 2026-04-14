@@ -4,21 +4,24 @@ Copyright (c) 2022, binary butterfly GmbH and contributors
 Use of this source code is governed by an MIT-style license that can be found in the LICENSE file.
 """
 
-from typing import Any
+from typing import Any, TypeVar, cast
 
 from sqlalchemy.orm import Query
 from sqlalchemy.sql import ColumnElement
+from typing_extensions import override
 from validataclass.dataclasses import validataclass, Default
 from validataclass.validators import IntegerValidator
 
+from validataclass_search_queries import pagination, sorting
 from .abstract_pagination_mixin import AbstractPaginationMixin
 from .paginated_result import PaginatedResult
 from .pagination_limit_validator import PaginationLimitValidator
-from .. import pagination, sorting
 
 __all__ = [
     'CursorPaginationMixin',
 ]
+
+T = TypeVar('T')
 
 
 @validataclass
@@ -92,12 +95,17 @@ class CursorPaginationMixin(AbstractPaginationMixin):
     # Limit: Number of entries per page
     limit: int | None = PaginationLimitValidator(max_value=100), Default(20)
 
-    def __init_subclass__(cls, **kwargs):
+    @override
+    def __init_subclass__(cls, **kwargs: Any):
         # Pagination mixins are not compatible with each other, only one can be used at the same time
-        if issubclass(cls, pagination.OffsetPaginationMixin):
-            raise TypeError(f'Invalid base classes in {cls}: Combining multiple pagination mixins is not allowed')
-        if issubclass(cls, sorting.SortingMixin):
-            raise TypeError(f'Invalid base classes in {cls}: CursorPaginationMixin cannot be combined with SortingMixin')
+        if issubclass(cls, pagination.OffsetPaginationMixin):  # type: ignore[unreachable, unused-ignore]
+            raise TypeError(
+                f'Invalid base classes in {cls}: Combining multiple pagination mixins is not allowed'
+            )
+        if issubclass(cls, sorting.SortingMixin):  # type: ignore[unreachable, unused-ignore]
+            raise TypeError(
+                f'Invalid base classes in {cls}: CursorPaginationMixin cannot be combined with SortingMixin'
+            )
 
         super().__init_subclass__(**kwargs)
 
@@ -111,7 +119,7 @@ class CursorPaginationMixin(AbstractPaginationMixin):
         """
         return 'id'
 
-    def get_cursor_column(self, model_cls: Any) -> ColumnElement:
+    def get_cursor_column(self, model_cls: Any) -> ColumnElement[Any]:
         """
         Returns the column that is used as cursor for cursor pagination.
 
@@ -121,9 +129,12 @@ class CursorPaginationMixin(AbstractPaginationMixin):
         THIS method, be sure to also adjust `get_cursor_column_name()` so that it still works with other methods like
         `get_next_start_value()`.
         """
-        return getattr(model_cls, self.get_cursor_column_name())
+        # SQLAlchemy's typing is complicated and we don't know what exact types we have to expect here, so we'll just
+        # pretend it's always a ColumnElement to make the type checker happy.
+        return cast(ColumnElement[Any], getattr(model_cls, self.get_cursor_column_name()))
 
-    def apply_pagination_to_query(self, query: Query, model_cls: Any) -> Query:
+    @override
+    def apply_pagination_to_query(self, query: Query[T], model_cls: Any) -> Query[T]:
         """
         Applies the pagination parameters to an SQLAlchemy query and returns the new query.
 
@@ -135,24 +146,28 @@ class CursorPaginationMixin(AbstractPaginationMixin):
             return query
 
         # The start parameter should always be set, but in case it is not, default to 0
-        if self.start is None:
-            self.start = 0
+        if self.start is None:  # type: ignore[comparison-overlap]
+            self.start = 0  # type: ignore[unreachable]
 
         # Get the cursor column from the model class
         key_column = self.get_cursor_column(model_cls)
 
         # Cursor pagination requires the data to be ordered by the cursor column
-        return query.order_by(key_column) \
-            .filter(key_column >= self.start) \
+        return (
+            query.order_by(key_column)
+            .filter(key_column >= self.start)
             .limit(self.limit)
+        )
 
+    @override
     def get_start_parameter_name(self) -> str:
         """
         Returns the name of the pagination start parameter ("start" for cursor pagination).
         """
         return 'start'
 
-    def get_next_start_value(self, paginated_result: PaginatedResult) -> int | None:
+    @override
+    def get_next_start_value(self, paginated_result: PaginatedResult[Any]) -> int | None:
         """
         Returns the next value for the pagination start parameter to retrieve the next page of data, or None if there
         is no next page.
@@ -170,11 +185,16 @@ class CursorPaginationMixin(AbstractPaginationMixin):
         # Get last result in list
         last_item = paginated_result[-1]
 
-        # Get cursor value (e.g. ID) of last result, allowing both objects and dictionaries, and increment by one
+        # Get cursor value (e.g. ID) of last result, allowing both objects and dictionaries
         cursor_key = self.get_cursor_column_name()
         if isinstance(last_item, dict):
-            return last_item.get(cursor_key) + 1
+            last_item_value = last_item.get(cursor_key)
         elif hasattr(last_item, cursor_key):
-            return getattr(last_item, cursor_key) + 1
+            last_item_value = getattr(last_item, cursor_key)
         else:
-            raise Exception(f'Last item of PaginatedResult has neither attribute nor dictionary key "{cursor_key}": {last_item}')
+            raise Exception(
+                f'Last item of PaginatedResult has neither attribute nor dictionary key "{cursor_key}": {last_item}'
+            )
+
+        # Return last cursor value incremented by one
+        return last_item_value + 1 if isinstance(last_item_value, int) else None

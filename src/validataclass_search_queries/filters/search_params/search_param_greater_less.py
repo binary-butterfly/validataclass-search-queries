@@ -7,6 +7,7 @@ Use of this source code is governed by an MIT-style license that can be found in
 from typing import Any
 
 from sqlalchemy.sql import ColumnElement
+from typing_extensions import override
 
 from .base_search_param import SearchParam
 
@@ -25,9 +26,9 @@ class SearchParamGreaterThan(SearchParam):
     Search parameter to filter for values greater than the filter value (`column > value`).
     """
 
-    @staticmethod
-    def sqlalchemy_filter(column: ColumnElement, value: Any) -> ColumnElement:
-        return column > value
+    @override
+    def sqlalchemy_filter(self, column: ColumnElement[Any], value: Any) -> ColumnElement[bool]:
+        return column.__gt__(value)
 
 
 class SearchParamGreaterOrEqual(SearchParam):
@@ -35,9 +36,9 @@ class SearchParamGreaterOrEqual(SearchParam):
     Search parameter to filter for values greater than or equal to the filter value (`column >= value`).
     """
 
-    @staticmethod
-    def sqlalchemy_filter(column: ColumnElement, value: Any) -> ColumnElement:
-        return column >= value
+    @override
+    def sqlalchemy_filter(self, column: ColumnElement[Any], value: Any) -> ColumnElement[bool]:
+        return column.__ge__(value)
 
 
 class SearchParamLessThan(SearchParam):
@@ -45,9 +46,9 @@ class SearchParamLessThan(SearchParam):
     Search parameter to filter for values less than the filter value (`column < value`).
     """
 
-    @staticmethod
-    def sqlalchemy_filter(column: ColumnElement, value: Any) -> ColumnElement:
-        return column < value
+    @override
+    def sqlalchemy_filter(self, column: ColumnElement[Any], value: Any) -> ColumnElement[bool]:
+        return column.__lt__(value)
 
 
 class SearchParamLessOrEqual(SearchParam):
@@ -55,9 +56,9 @@ class SearchParamLessOrEqual(SearchParam):
     Search parameter to filter for values less than or equal to the filter value (`column <= value`).
     """
 
-    @staticmethod
-    def sqlalchemy_filter(column: ColumnElement, value: Any) -> ColumnElement:
-        return column <= value
+    @override
+    def sqlalchemy_filter(self, column: ColumnElement[Any], value: Any) -> ColumnElement[bool]:
+        return column.__le__(value)
 
 
 class SearchParamSince(SearchParamGreaterOrEqual):

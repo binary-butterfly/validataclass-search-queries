@@ -4,7 +4,10 @@ Copyright (c) 2022, binary butterfly GmbH and contributors
 Use of this source code is governed by an MIT-style license that can be found in the LICENSE file.
 """
 
+from typing import Any
+
 import pytest
+from typing_extensions import override
 
 from validataclass_search_queries.pagination import PaginatedResult
 
@@ -15,6 +18,7 @@ class MockItem:
     def __init__(self, name: str):
         self.name = name
 
+    @override
     def __eq__(self, other):
         return type(self) is type(other) and self.name == other.name
 
@@ -22,7 +26,7 @@ class MockItem:
 class MockItemToDictable(MockItem):
     """ Variation of MockItem that has a to_dict() method. """
 
-    def to_dict(self) -> dict:
+    def to_dict(self) -> dict[str, Any]:
         return {'name': self.name}
 
 
@@ -33,14 +37,14 @@ class MockMapper:
         self.name = name
 
     @staticmethod
-    def map_static(item) -> str:
+    def map_static(item: MockItem) -> str:
         return str(item)
 
     @classmethod
-    def map_class(cls, item) -> str:
+    def map_class(cls, item: MockItem) -> str:
         return f'[{cls.__name__}] {item}'
 
-    def map_instance(self, item) -> str:
+    def map_instance(self, item: MockItem) -> str:
         return f'[{self.name}] {item}'
 
 
@@ -83,7 +87,9 @@ def test_paginated_result(input_list, total_count):
     ]
 )
 def test_paginated_result_to_dict_basic_types(paginated_result, expected_dict):
-    """ Test PaginatedResult.to_dict() with basic types and objects without to_dict() method (recursive and non-recursive). """
+    """
+    Test PaginatedResult.to_dict() with basic types and objects without to_dict() method (recursive and non-recursive).
+    """
     assert paginated_result.to_dict() == expected_dict
     assert paginated_result.to_dict(recursive=False) == expected_dict
     assert paginated_result.to_dict(recursive=True) == expected_dict

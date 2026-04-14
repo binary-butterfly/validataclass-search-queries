@@ -7,6 +7,7 @@ Use of this source code is governed by an MIT-style license that can be found in
 from typing import Any
 
 from sqlalchemy.sql import ColumnElement
+from typing_extensions import override
 
 from .base_search_param import SearchParam
 
@@ -26,7 +27,7 @@ class SearchParamMultiSelect(SearchParam):
     is set to a single value, the filter will be equivalent to an "equals" filter. See the `MultiSelectValidator`.
     """
 
-    @staticmethod
-    def sqlalchemy_filter(column: ColumnElement, value: Any) -> ColumnElement:
+    @override
+    def sqlalchemy_filter(self, column: ColumnElement[Any], value: Any) -> ColumnElement[bool]:
         value_list = value if isinstance(value, list) else [value]
         return column.in_(value_list)
