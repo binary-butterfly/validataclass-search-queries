@@ -98,11 +98,11 @@ class CursorPaginationMixin(AbstractPaginationMixin):
     @override
     def __init_subclass__(cls, **kwargs: Any):
         # Pagination mixins are not compatible with each other, only one can be used at the same time
-        if issubclass(cls, pagination.OffsetPaginationMixin):  # type: ignore[unreachable]
+        if issubclass(cls, pagination.OffsetPaginationMixin):  # type: ignore[unreachable, unused-ignore]
             raise TypeError(
                 f'Invalid base classes in {cls}: Combining multiple pagination mixins is not allowed'
             )
-        if issubclass(cls, sorting.SortingMixin):  # type: ignore[unreachable]
+        if issubclass(cls, sorting.SortingMixin):  # type: ignore[unreachable, unused-ignore]
             raise TypeError(
                 f'Invalid base classes in {cls}: CursorPaginationMixin cannot be combined with SortingMixin'
             )
