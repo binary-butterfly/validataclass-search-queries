@@ -54,7 +54,7 @@ jobs:
           path: dist/
 
       - name: Install built package with testing dependencies
-        run: pip install "$(find dist/ -name 'validataclass-search-queries-*.whl')[testing]"
+        run: pip install "$(find dist/ -name 'validataclass_search_queries-*.whl')[testing]"
 
       - name: Run unit tests
         run: python -m pytest
