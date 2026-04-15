@@ -81,7 +81,7 @@ class SortingMixin(AbstractSortingMixin):
         return column.desc() if self.sorting_direction is SortingDirection.DESC else column.asc()
 
     @override
-    def apply_sorting_to_query(self, query: Query[T], model_cls: Any) -> Query[T]:
+    def apply_sorting_to_query(self, query: 'Query[T]', model_cls: Any) -> 'Query[T]':
         """
         Applies the sorting parameters to an SQLAlchemy query (`query.order_by()`) and returns the new query.
 
