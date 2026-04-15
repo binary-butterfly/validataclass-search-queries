@@ -15,3 +15,6 @@ This is the index of the documentation.
 
 3. [Reference of search filter types](03-search-param-reference.md)
     - List of all types of search filters (`SearchParam` classes)
+
+4. [Type checking with mypy](04-mypy-plugin.md)
+    - How to use the validataclass mypy plugin together with this library
