@@ -6,7 +6,7 @@
 Shared Python library for search queries based on [validataclass](https://github.com/binary-butterfly/validataclass).
 
 Implements search filters, pagination and sorting using dataclasses and validators, and provides helpers to work with
-database queries (currently only SQLAlchemy 1.4 and 2.0 are supported).
+database queries (currently SQLAlchemy 1.4 and 2.0 are supported, however, support for SQLAlchemy 1.4 is deprecated now).
 
 **Status:** Beta.
 
@@ -26,7 +26,7 @@ If you add the package to your dependencies, it is recommended to use
 always get the latest version of the library but without running into breaking changes:
 
 ```shell
-pip install validataclass-search-queries~=0.5.0
+pip install validataclass-search-queries~=0.6.0
 ```
 
 However, keep in mind that the library is still in its beta phase (as indicated by the major version of 0). There can
