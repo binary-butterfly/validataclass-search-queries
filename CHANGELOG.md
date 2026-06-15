@@ -9,6 +9,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased](https://github.com/binary-butterfly/validataclass-search-queries/compare/0.6.0...HEAD)
 
 
+## [0.6.1](https://github.com/binary-butterfly/validataclass-search-queries/releases/tag/0.6.1) - 2026-06-15
+
+[Full changelog](https://github.com/binary-butterfly/validataclass-search-queries/compare/0.6.0...0.6.1)
+
+This patch release adds support for [validataclass 0.13.0] while still supporting 0.12.0.
+
+No further changes.
+
+### Dependencies
+
+- Add support for validataclass 0.13.0. [#11]
+
+[validataclass 0.13.0]: https://github.com/binary-butterfly/validataclass/releases/tag/0.13.0
+[#11]: https://github.com/binary-butterfly/validataclass-search-queries/pull/11
+
+
 ## [0.6.0](https://github.com/binary-butterfly/validataclass-search-queries/releases/tag/0.6.0) - 2026-04-15
 
 [Full changelog](https://github.com/binary-butterfly/validataclass-search-queries/compare/0.5.1...0.6.0)
